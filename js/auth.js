@@ -1099,18 +1099,18 @@ export class Auth {
 
     const trainerData = {
       id: newId,
-      title: document.getElementById('trainerName').value,
-      description: document.getElementById('trainerDesc').value,
-      detailedDescription: document.getElementById('trainerDetailedDesc').value,
-      category: document.getElementById('trainerCategory').value,
-      experience: document.getElementById('trainerExp').value,
+      title: document.getElementById('trainerName').value || '',
+      description: document.getElementById('trainerDesc').value || '',
+      detailedDescription: document.getElementById('trainerDetailedDesc').value || '',
+      category: document.getElementById('trainerCategory').value || 'Фитнес',
+      experience: document.getElementById('trainerExp').value || '',
       image: mainPhoto,
       imageAlt: `Тренер ${document.getElementById('trainerName').value}`,
       images: images.length > 0 ? images : [mainPhoto],
-      videos: videos.length > 0 ? videos : undefined,
-      specialization: specialization.length > 0 ? specialization : undefined,
-      education: document.getElementById('trainerEducation').value,
-      phone: document.getElementById('trainerPhone').value,
+      videos: videos.length > 0 ? videos : [],
+      specialization: specialization.length > 0 ? specialization : [],
+      education: document.getElementById('trainerEducation').value || '',
+      phone: document.getElementById('trainerPhone').value || '',
       price: 2500,
       currency: 'RUB'
     };
