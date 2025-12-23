@@ -68,6 +68,7 @@ export class Modal {
     this.currentProduct = product;
     this.renderContent(product);
     this.modal.classList.add('modal--open');
+    document.body.classList.add('modal-open');
     document.body.style.overflow = 'hidden';
     
     // Focus close button for accessibility
@@ -91,6 +92,7 @@ export class Modal {
     }
     
     this.modal.classList.remove('modal--open');
+    document.body.classList.remove('modal-open');
     document.body.style.overflow = '';
     this.currentProduct = null;
   }

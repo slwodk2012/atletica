@@ -196,6 +196,13 @@
   display: block;
 }
 
+/* Prevent body scroll when modal is open */
+body.modal-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
+
 .modal__overlay {
   position: absolute;
   top: 0;
@@ -217,6 +224,7 @@
   width: 90%;
   max-height: 90vh;
   overflow-y: auto;
+  overflow-x: hidden;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
 
@@ -570,6 +578,9 @@
 .modal__main-display {
   position: relative;
   min-height: 300px;
+  overflow: hidden;
+  touch-action: pan-y pinch-zoom;
+  max-width: 100%;
 }
 
 /* Role subtitle */
@@ -630,14 +641,6 @@
   .modal__nav-btn--next {
     right: 5px;
   }
-}
-
-/* Main display - prevent horizontal scroll */
-.modal__main-display {
-  position: relative;
-  min-height: 300px;
-  overflow: hidden;
-  touch-action: pan-y pinch-zoom;
 }
 
 
