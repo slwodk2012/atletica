@@ -48,6 +48,9 @@ export class Auth {
     };
     // Cache for trainers
     this.cachedTrainers = null;
+    // Undo history
+    this.undoHistory = [];
+    this.maxUndoSteps = 10;
     
     this.init();
   }
@@ -286,15 +289,18 @@ export class Auth {
     return `
       <div class="admin-section admin-section--active">
         <div class="admin-trainer-selector">
-          <h3 style="color: #f4d03f; margin-bottom: 15px;">Выберите тренера для редактирования</h3>
-          <select id="trainerSelect" class="admin-select">
+          <h3 style="color: #f4d03f; margin-bottom: 12px; font-size: 14px;">Выберите тренера для редактирования</h3>
+          <select id="trainerSelect" class="admin-select" style="font-size: 13px;">
             <option value="">-- Выберите тренера --</option>
             ${trainers.map(trainer => `
               <option value="${trainer.id}">${trainer.title} (${trainer.category})</option>
             `).join('')}
           </select>
-          <button class="admin-btn admin-btn--add" id="addTrainerBtn" style="margin-top: 15px;">+ Добавить нового тренера</button>
-          <button class="admin-btn" id="exportDataBtn" style="margin-top: 15px; margin-left: 10px; background: #2196F3;">Экспорт данных (JSON)</button>
+          <div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;">
+            <button class="admin-btn admin-btn--add" id="addTrainerBtn" style="font-size: 12px; padding: 8px 12px;">+ Добавить тренера</button>
+            <button class="admin-btn" id="undoBtn" style="font-size: 12px; padding: 8px 12px; background: #ff9800;">↩ Отменить</button>
+            <button class="admin-btn" id="exportDataBtn" style="font-size: 12px; padding: 8px 12px; background: #2196F3;">Экспорт JSON</button>
+          </div>
         </div>
 
         <div id="trainerFormContainer"></div>
@@ -615,6 +621,11 @@ export class Auth {
     // Add trainer button
     document.getElementById('addTrainerBtn')?.addEventListener('click', async () => {
       await this.showDetailedTrainerForm();
+    });
+    
+    // Undo button
+    document.getElementById('undoBtn')?.addEventListener('click', async () => {
+      await this.undoLastAction();
     });
 
     // Export data button
@@ -1287,6 +1298,25 @@ export class Auth {
     };
 
     try {
+      // Save current state to undo history before making changes
+      if (trainerId) {
+        const oldTrainer = trainers.find(t => t.id === trainerId);
+        if (oldTrainer) {
+          this.addToUndoHistory({
+            type: 'update',
+            trainerId: trainerId,
+            oldData: JSON.parse(JSON.stringify(oldTrainer)),
+            newData: trainerData
+          });
+        }
+      } else {
+        this.addToUndoHistory({
+          type: 'create',
+          trainerId: newId,
+          newData: trainerData
+        });
+      }
+      
       // Save to Firebase
       await firebase.saveTrainer(trainerData);
       console.log('✅ Сохранено в Firebase:', trainerData.id, trainerData.title);
@@ -1304,6 +1334,55 @@ export class Auth {
     } catch (error) {
       console.error('❌ Ошибка сохранения в Firebase:', error);
       showToast('Ошибка сохранения: ' + error.message, 'error');
+    }
+  }
+  
+  addToUndoHistory(action) {
+    this.undoHistory.push(action);
+    if (this.undoHistory.length > this.maxUndoSteps) {
+      this.undoHistory.shift();
+    }
+    // Save to localStorage
+    localStorage.setItem('undoHistory', JSON.stringify(this.undoHistory));
+  }
+  
+  async undoLastAction() {
+    // Load from localStorage
+    const savedHistory = localStorage.getItem('undoHistory');
+    if (savedHistory) {
+      this.undoHistory = JSON.parse(savedHistory);
+    }
+    
+    if (this.undoHistory.length === 0) {
+      showToast('Нет действий для отмены', 'info');
+      return;
+    }
+    
+    const lastAction = this.undoHistory.pop();
+    localStorage.setItem('undoHistory', JSON.stringify(this.undoHistory));
+    
+    const { FirebaseManager } = await import('./firebase.js');
+    const firebase = new FirebaseManager();
+    
+    try {
+      if (lastAction.type === 'update') {
+        // Restore old data
+        await firebase.saveTrainer(lastAction.oldData);
+        showToast(`Отменено изменение: ${lastAction.oldData.title}`, 'success');
+      } else if (lastAction.type === 'create') {
+        // Delete created trainer
+        await firebase.deleteTrainer(lastAction.trainerId);
+        showToast(`Отменено создание: ${lastAction.newData.title}`, 'success');
+      } else if (lastAction.type === 'delete') {
+        // Restore deleted trainer
+        await firebase.saveTrainer(lastAction.oldData);
+        showToast(`Восстановлен: ${lastAction.oldData.title}`, 'success');
+      }
+      
+      setTimeout(() => window.location.reload(), 1000);
+    } catch (error) {
+      console.error('Undo error:', error);
+      showToast('Ошибка отмены: ' + error.message, 'error');
     }
   }
 
@@ -1342,6 +1421,18 @@ export class Auth {
       // Import Firebase manager
       const { FirebaseManager } = await import('./firebase.js');
       const firebase = new FirebaseManager();
+      
+      // Load trainer data before deleting for undo
+      const trainers = await firebase.loadTrainers();
+      const trainerToDelete = trainers.find(t => t.id === trainerId);
+      
+      if (trainerToDelete) {
+        this.addToUndoHistory({
+          type: 'delete',
+          trainerId: trainerId,
+          oldData: JSON.parse(JSON.stringify(trainerToDelete))
+        });
+      }
       
       // Delete from Firebase
       await firebase.deleteTrainer(trainerId);

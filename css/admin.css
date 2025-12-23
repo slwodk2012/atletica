@@ -340,38 +340,38 @@
 
 .admin-form {
   background: #2a2a2a;
-  padding: 20px;
+  padding: 15px;
   border-radius: 8px;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 12px;
 }
 
 .admin-form__group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 5px;
 }
 
 .admin-form__group label {
   color: #f4d03f;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .admin-form__group input,
 .admin-form__group textarea,
 .admin-form__group select {
-  padding: 10px 14px;
+  padding: 8px 10px;
   background: #1a1a1a;
-  border: 2px solid #3a3a3a;
-  border-radius: 6px;
+  border: 1px solid #3a3a3a;
+  border-radius: 4px;
   color: #fff;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .admin-form__group textarea {
-  min-height: 100px;
+  min-height: 80px;
   resize: vertical;
 }
 
@@ -385,18 +385,18 @@
 .admin-content-editor {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 15px;
 }
 
 .admin-content-section {
   background: #2a2a2a;
-  padding: 20px;
+  padding: 15px;
   border-radius: 8px;
 }
 
 .admin-content-section__title {
   color: #f4d03f;
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 700;
   margin-bottom: 15px;
 }
@@ -422,31 +422,31 @@
 
 /* Detailed Form Styles */
 .admin-form--detailed {
-  max-height: 600px;
+  max-height: 500px;
   overflow-y: auto;
-  padding-right: 10px;
+  padding-right: 8px;
 }
 
 .admin-form-section {
   background: #2a2a2a;
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 20px;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 12px;
 }
 
 .admin-form-section__title {
   color: #f4d03f;
-  font-size: 18px;
+  font-size: 13px;
   font-weight: 700;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
 }
 
 .admin-form__row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 15px;
+  gap: 10px;
 }
 
 .admin-photo-item,
@@ -454,9 +454,9 @@
 .admin-spec-item {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  margin-bottom: 15px;
-  padding: 15px;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 10px;
   background: #1a1a1a;
   border-radius: 6px;
 }
