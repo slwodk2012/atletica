@@ -37,13 +37,24 @@
   height: 100%;
   display: block;
   object-fit: cover;
-  object-position: center center;
+  object-position: center 30%;
 }
 
-/* Mobile - show more of the person */
+/* Mobile - show face properly */
 @media (max-width: 767px) {
   .card__image-wrapper {
-    padding-bottom: 110%;
+    padding-bottom: 120%;
+  }
+  
+  .card__image {
+    object-position: center 25%;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 400px) {
+  .card__image-wrapper {
+    padding-bottom: 130%;
   }
   
   .card__image {
