@@ -179,6 +179,136 @@
                 font-size: 13px !important;
             }
         }
+        
+        /* Quote Section Styles */
+        .quote-section {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            padding: 80px 20px;
+            overflow: hidden;
+        }
+        
+        .quote-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 60px;
+        }
+        
+        .quote-video {
+            flex: 1;
+            max-width: 500px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(244, 208, 63, 0.2);
+            position: relative;
+        }
+        
+        .quote-video::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            background: linear-gradient(45deg, #f4d03f, #e2b007, #f4d03f);
+            border-radius: 22px;
+            z-index: -1;
+        }
+        
+        .quote-video video {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 20px;
+        }
+        
+        .quote-content {
+            flex: 1;
+            padding: 20px;
+        }
+        
+        .quote-icon {
+            font-size: 120px;
+            color: #f4d03f;
+            font-family: Georgia, serif;
+            line-height: 0.8;
+            margin-bottom: -20px;
+            opacity: 0.8;
+        }
+        
+        .quote-text {
+            font-size: 28px;
+            font-weight: 300;
+            color: #ffffff;
+            line-height: 1.6;
+            margin: 0 0 30px 0;
+            font-style: italic;
+            border-left: 4px solid #f4d03f;
+            padding-left: 30px;
+        }
+        
+        .quote-author {
+            font-size: 18px;
+            color: #f4d03f;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 20px;
+        }
+        
+        .quote-subtitle {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.6);
+            margin: 0;
+        }
+        
+        /* Quote Section Responsive */
+        @media (max-width: 900px) {
+            .quote-container {
+                flex-direction: column;
+                gap: 40px;
+            }
+            
+            .quote-video {
+                max-width: 100%;
+                width: 100%;
+            }
+            
+            .quote-content {
+                text-align: center;
+                padding: 0;
+            }
+            
+            .quote-text {
+                font-size: 22px;
+                border-left: none;
+                padding-left: 0;
+                border-top: 4px solid #f4d03f;
+                padding-top: 30px;
+            }
+            
+            .quote-icon {
+                font-size: 80px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .quote-section {
+                padding: 50px 15px;
+            }
+            
+            .quote-text {
+                font-size: 18px;
+            }
+            
+            .quote-icon {
+                font-size: 60px;
+            }
+            
+            .quote-author {
+                font-size: 16px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -239,6 +369,25 @@
                     </svg>
                 </span>
             </button>
+        </div>
+    </section>
+
+    <!-- Quote Section with Video -->
+    <section class="quote-section">
+        <div class="quote-container">
+            <div class="quote-video">
+                <video autoplay muted loop playsinline>
+                    <source src="ОБЛОЖКА.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div class="quote-content">
+                <div class="quote-icon">"</div>
+                <blockquote class="quote-text">
+                    Сила не приходит от физических способностей. Она приходит от несгибаемой воли.
+                </blockquote>
+                <cite class="quote-author">— Махатма Ганди</cite>
+                <p class="quote-subtitle">Начни свой путь к совершенству сегодня</p>
+            </div>
         </div>
     </section>
 
