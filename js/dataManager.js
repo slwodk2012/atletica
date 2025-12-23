@@ -12,23 +12,7 @@ export class DataManager {
    */
   async loadProducts() {
     try {
-      // Check localStorage first for admin changes
-      const savedData = localStorage.getItem('trainersData');
-      if (savedData) {
-        try {
-          const parsed = JSON.parse(savedData);
-          const products = Array.isArray(parsed) ? parsed : (parsed.products || []);
-          if (products.length > 0) {
-            this.products = products;
-            console.log('Loaded from localStorage:', this.products.length, 'trainers');
-            return this.products;
-          }
-        } catch (e) {
-          console.warn('localStorage error, loading from JSON');
-        }
-      }
-      
-      // Load from JSON file
+      // First try to load from JSON file (always fresh data)
       const response = await fetch('data/products.json');
       
       if (!response.ok) {
@@ -42,14 +26,13 @@ export class DataManager {
       }
       
       this.products = data.products;
-      
-      // Save to localStorage for future admin edits
-      localStorage.setItem('trainersData', JSON.stringify(this.products));
-      console.log('Loaded from JSON and saved to localStorage:', this.products.length, 'trainers');
+      console.log('Loaded from JSON:', this.products.length, 'trainers');
       
       return this.products;
     } catch (error) {
       console.error('Failed to load products:', error);
+      // Clear any corrupted localStorage
+      localStorage.removeItem('trainersData');
       throw error;
     }
   }
