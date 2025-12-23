@@ -26,7 +26,7 @@
   width: 100%;
   overflow: hidden;
   background: #1a1a1a;
-  padding-bottom: 120%; /* 3:4 aspect ratio fallback */
+  padding-bottom: 130%;
 }
 
 .card__image {
@@ -37,13 +37,24 @@
   height: 100%;
   display: block;
   object-fit: cover;
-  object-position: center top;
+  object-position: center center;
+}
+
+/* Mobile - show more of the person */
+@media (max-width: 767px) {
+  .card__image-wrapper {
+    padding-bottom: 110%;
+  }
+  
+  .card__image {
+    object-position: center 20%;
+  }
 }
 
 /* Better aspect ratio for landscape screens */
 @media (orientation: landscape) and (min-width: 768px) {
   .card__image-wrapper {
-    padding-bottom: 100%; /* 1:1 for landscape tablets */
+    padding-bottom: 100%;
   }
 }
 
