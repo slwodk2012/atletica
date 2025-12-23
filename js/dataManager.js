@@ -46,12 +46,23 @@ export class DataManager {
     try {
       const trainers = await this.firebase.loadTrainers();
       if (trainers && trainers.length > 0) {
-        // Always use Firebase data as source of truth
-        this.products = trainers;
-        console.log('Updated from Firebase:', this.products.length, 'trainers');
-        if (onUpdate) onUpdate(this.products);
+        // Only update if data is actually different
+        const currentIds = this.products.map(p => p.id).sort().join(',');
+        const newIds = trainers.map(p => p.id).sort().join(',');
+        
+        if (currentIds !== newIds) {
+          // Different trainers - update
+          this.products = trainers;
+          console.log('Updated from Firebase:', this.products.length, 'trainers');
+          if (onUpdate) onUpdate(this.products);
+        } else {
+          // Same trainers - just update data silently (no re-render)
+          this.products = trainers;
+          console.log('Firebase synced (no UI update needed)');
+        }
       } else if (this.products.length > 0) {
         // Firebase empty, initialize in background
+        console.log('Initializing Firebase with JSON data...');
         this.firebase.initializeFromJSON(this.products).catch(e => 
           console.warn('Firebase init error:', e)
         );
