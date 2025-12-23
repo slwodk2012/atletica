@@ -26,7 +26,7 @@
   width: 100%;
   overflow: hidden;
   background: #1a1a1a;
-  padding-bottom: 130%;
+  padding-bottom: 100%;
 }
 
 .card__image {
@@ -37,35 +37,24 @@
   height: 100%;
   display: block;
   object-fit: cover;
-  object-position: center 30%;
+  object-position: top center;
 }
 
-/* Mobile - show face properly */
+/* Mobile - square cards show face better */
 @media (max-width: 767px) {
   .card__image-wrapper {
-    padding-bottom: 120%;
+    padding-bottom: 100%;
   }
   
   .card__image {
-    object-position: center 25%;
-  }
-}
-
-/* Very small screens */
-@media (max-width: 400px) {
-  .card__image-wrapper {
-    padding-bottom: 130%;
-  }
-  
-  .card__image {
-    object-position: center 20%;
+    object-position: top center;
   }
 }
 
 /* Better aspect ratio for landscape screens */
 @media (orientation: landscape) and (min-width: 768px) {
   .card__image-wrapper {
-    padding-bottom: 100%;
+    padding-bottom: 90%;
   }
 }
 
