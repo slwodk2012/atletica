@@ -46,8 +46,7 @@ export class Auth {
     this.users = {
       'atletika1203': 'Atletika293At@A'
     };
-    // Cache for Firebase and trainers
-    this.firebaseModule = null;
+    // Cache for trainers
     this.cachedTrainers = null;
     
     this.init();
@@ -262,20 +261,11 @@ export class Auth {
   }
 
   async renderTrainersPanel() {
-    // Use cached trainers if available
-    if (this.cachedTrainers && this.cachedTrainers.length > 0) {
-      const trainers = this.cachedTrainers;
-      trainers.sort((a, b) => a.title.localeCompare(b.title, 'ru'));
-      return this.generateTrainersPanelHTML(trainers);
-    }
-    
     // Load trainers from Firebase
     let trainers = [];
     try {
-      if (!this.firebaseModule) {
-        this.firebaseModule = await import('./firebase.js');
-      }
-      const firebase = new this.firebaseModule.FirebaseManager();
+      const { FirebaseManager } = await import('./firebase.js');
+      const firebase = new FirebaseManager();
       trainers = await firebase.loadTrainers();
       console.log('Загружено из Firebase для панели:', trainers.length);
       
@@ -286,9 +276,6 @@ export class Auth {
         trainers = data.products || [];
       }
       
-      // Cache trainers
-      this.cachedTrainers = trainers;
-      
       // Сортировка по алфавиту
       trainers.sort((a, b) => a.title.localeCompare(b.title, 'ru'));
     } catch (error) {
@@ -296,10 +283,6 @@ export class Auth {
       trainers = [];
     }
 
-    return this.generateTrainersPanelHTML(trainers);
-  }
-  
-  generateTrainersPanelHTML(trainers) {
     return `
       <div class="admin-section admin-section--active">
         <div class="admin-trainer-selector">
@@ -317,7 +300,6 @@ export class Auth {
         <div id="trainerFormContainer"></div>
       </div>
     `;
-  }
   }
 
   renderContentPanel() {
@@ -1176,9 +1158,6 @@ export class Auth {
       // Save to Firebase
       await firebase.saveTrainer(trainerData);
       console.log('✅ Сохранено в Firebase:', trainerData.id, trainerData.title);
-      
-      // Clear cache
-      this.cachedTrainers = null;
       
       // Show success toast
       showToast('Тренер сохранен!', 'success');
