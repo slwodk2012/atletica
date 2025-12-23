@@ -11,12 +11,13 @@ export class DataManager {
   }
 
   /**
-   * Load products - fast JSON first, then sync with Firebase
+   * Load products - instant from JSON, then background sync with Firebase
+   * @param {Function} onUpdate - callback when Firebase data arrives
    * @returns {Promise<Array>} Array of product objects
    */
-  async loadProducts() {
+  async loadProducts(onUpdate) {
     try {
-      // Load JSON first (fast)
+      // Load JSON first (instant)
       const response = await fetch('data/products.json');
       if (response.ok) {
         const data = await response.json();
@@ -26,30 +27,39 @@ export class DataManager {
         }
       }
 
-      // Then try Firebase (may have newer data)
+      // Firebase sync in background (don't wait)
       if (this.useFirebase) {
-        try {
-          const trainers = await this.firebase.loadTrainers();
-          if (trainers && trainers.length > 0) {
-            this.products = trainers;
-            console.log('Updated from Firebase:', this.products.length, 'trainers');
-          } else if (this.products.length > 0) {
-            // Firebase empty, initialize with JSON data
-            console.log('Firebase empty, initializing...');
-            // Don't wait for this - do it in background
-            this.firebase.initializeFromJSON(this.products).catch(e => 
-              console.warn('Firebase init error:', e)
-            );
-          }
-        } catch (fbError) {
-          console.warn('Firebase error:', fbError.message);
-        }
+        this.syncWithFirebase(onUpdate);
       }
       
       return this.products;
     } catch (error) {
       console.error('Failed to load products:', error);
       throw error;
+    }
+  }
+
+  /**
+   * Sync with Firebase in background
+   */
+  async syncWithFirebase(onUpdate) {
+    try {
+      const trainers = await this.firebase.loadTrainers();
+      if (trainers && trainers.length > 0) {
+        // Only update if Firebase has different data
+        if (trainers.length !== this.products.length) {
+          this.products = trainers;
+          console.log('Updated from Firebase:', this.products.length, 'trainers');
+          if (onUpdate) onUpdate(this.products);
+        }
+      } else if (this.products.length > 0) {
+        // Firebase empty, initialize in background
+        this.firebase.initializeFromJSON(this.products).catch(e => 
+          console.warn('Firebase init error:', e)
+        );
+      }
+    } catch (fbError) {
+      console.warn('Firebase sync error:', fbError.message);
     }
   }
 

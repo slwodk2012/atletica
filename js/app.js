@@ -40,15 +40,19 @@ class App {
       this.auth = new Auth(this.visualEditor);
       this.auth.loadSavedSettings();
 
-      // Show loading state
-      this.showLoading();
+      // Load products with callback for Firebase updates
+      const onFirebaseUpdate = (products) => {
+        // Re-render gallery when Firebase data arrives
+        const valid = products.filter(p => p && p.id && p.title);
+        this.cardRenderer.renderGallery(valid, this.galleryContainer, 50);
+        this.setupEventListeners();
+        console.log('Gallery updated from Firebase');
+      };
 
-      // Load products
-      await this.dataManager.loadProducts();
+      await this.dataManager.loadProducts(onFirebaseUpdate);
       const validProducts = this.dataManager.getValidProducts();
 
       console.log('Loaded products:', validProducts.length);
-      console.log('Products data:', validProducts);
 
       if (validProducts.length === 0) {
         console.error('No valid products found!');
@@ -56,7 +60,7 @@ class App {
         return;
       }
 
-      // Render gallery
+      // Render gallery immediately
       this.cardRenderer.renderGallery(validProducts, this.galleryContainer, 50);
       console.log('Gallery rendered');
 
@@ -64,7 +68,6 @@ class App {
       this.setupEventListeners();
 
       // Load visual editor styles after DOM is fully rendered
-      // Use setTimeout to ensure all elements have data-edit-id attributes
       setTimeout(() => {
         this.visualEditor.loadStyles();
       }, 100);
