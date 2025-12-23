@@ -550,6 +550,24 @@ export class Auth {
             </div>
           </div>
 
+          <!-- Filters Section -->
+          <div class="admin-content-section">
+            <h3 class="admin-content-section__title">🏷️ Фильтры категорий</h3>
+            <p style="color: #999; font-size: 13px; margin-bottom: 15px;">
+              Управление кнопками фильтрации тренеров. Перетащите для изменения порядка.
+            </p>
+            <div class="admin-form">
+              <div id="filtersContainer">
+                ${this.renderFiltersEditor(settings)}
+              </div>
+              <button type="button" class="admin-btn admin-btn--add admin-btn--small" id="addFilterBtn" style="margin-top: 15px;">+ Добавить фильтр</button>
+              <div class="admin-form__row" style="margin-top: 15px;">
+                <button type="button" class="admin-btn admin-btn--small" id="sortFiltersAlpha">Сортировать А-Я</button>
+                <button type="button" class="admin-btn admin-btn--small" id="sortFiltersNum">Сортировать по номеру</button>
+              </div>
+            </div>
+          </div>
+
           <div class="admin-form-actions">
             <button class="admin-btn admin-btn--add" id="saveContentBtn">Сохранить и применить</button>
             <button class="admin-btn admin-btn--delete" id="resetContentBtn">Сбросить к умолчанию</button>
@@ -557,6 +575,29 @@ export class Auth {
         </div>
       </div>
     `;
+  }
+  
+  renderFiltersEditor(settings) {
+    const defaultFilters = [
+      { id: 1, text: 'Фитнес', filter: 'all', color: '#f4d03f', textColor: '#1a1a1a', active: true },
+      { id: 2, text: 'Кроссфит', filter: 'Кроссфит', color: 'transparent', textColor: '#ffffff', active: false },
+      { id: 3, text: 'Бодибилдинг', filter: 'Бодибилдинг', color: 'transparent', textColor: '#ffffff', active: false },
+      { id: 4, text: 'Тренер по боксу', filter: 'Бокс', color: 'transparent', textColor: '#ffffff', active: false },
+      { id: 5, text: 'Боевые единоборства', filter: 'Единоборства', color: 'transparent', textColor: '#ffffff', active: false }
+    ];
+    
+    const filters = settings.filters || defaultFilters;
+    
+    return filters.map((f, index) => `
+      <div class="admin-filter-item" data-index="${index}" draggable="true">
+        <span class="admin-filter-drag">☰</span>
+        <input type="text" class="filter-text-input" value="${f.text}" placeholder="Текст кнопки" data-index="${index}">
+        <input type="text" class="filter-value-input" value="${f.filter}" placeholder="Значение фильтра" data-index="${index}" style="width: 120px;">
+        <input type="color" class="filter-color-input" value="${f.color === 'transparent' ? '#3a3a3a' : f.color}" data-index="${index}" title="Цвет фона">
+        <input type="color" class="filter-text-color-input" value="${f.textColor}" data-index="${index}" title="Цвет текста">
+        <button type="button" class="admin-btn admin-btn--delete admin-btn--small remove-filter-btn" data-index="${index}">✕</button>
+      </div>
+    `).join('');
   }
 
   setupTrainersPanel() {
@@ -662,6 +703,104 @@ export class Auth {
         setTimeout(() => window.location.reload(), 1000);
       }
     });
+    
+    // Filter editor handlers
+    this.setupFilterEditorHandlers();
+  }
+  
+  setupFilterEditorHandlers() {
+    // Add filter button
+    document.getElementById('addFilterBtn')?.addEventListener('click', () => {
+      const container = document.getElementById('filtersContainer');
+      const index = container.children.length;
+      const newFilter = document.createElement('div');
+      newFilter.className = 'admin-filter-item';
+      newFilter.dataset.index = index;
+      newFilter.draggable = true;
+      newFilter.innerHTML = `
+        <span class="admin-filter-drag">☰</span>
+        <input type="text" class="filter-text-input" value="" placeholder="Текст кнопки" data-index="${index}">
+        <input type="text" class="filter-value-input" value="" placeholder="Значение фильтра" data-index="${index}" style="width: 120px;">
+        <input type="color" class="filter-color-input" value="#3a3a3a" data-index="${index}" title="Цвет фона">
+        <input type="color" class="filter-text-color-input" value="#ffffff" data-index="${index}" title="Цвет текста">
+        <button type="button" class="admin-btn admin-btn--delete admin-btn--small remove-filter-btn" data-index="${index}">✕</button>
+      `;
+      container.appendChild(newFilter);
+      this.setupFilterItemHandlers(newFilter);
+    });
+    
+    // Sort alphabetically
+    document.getElementById('sortFiltersAlpha')?.addEventListener('click', () => {
+      this.sortFilters('alpha');
+    });
+    
+    // Sort by number
+    document.getElementById('sortFiltersNum')?.addEventListener('click', () => {
+      this.sortFilters('num');
+    });
+    
+    // Setup handlers for existing items
+    document.querySelectorAll('.admin-filter-item').forEach(item => {
+      this.setupFilterItemHandlers(item);
+    });
+  }
+  
+  setupFilterItemHandlers(item) {
+    // Remove button
+    item.querySelector('.remove-filter-btn')?.addEventListener('click', () => {
+      item.remove();
+    });
+    
+    // Drag and drop
+    item.addEventListener('dragstart', (e) => {
+      item.classList.add('dragging');
+      e.dataTransfer.setData('text/plain', item.dataset.index);
+    });
+    
+    item.addEventListener('dragend', () => {
+      item.classList.remove('dragging');
+    });
+    
+    item.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      item.classList.add('drag-over');
+    });
+    
+    item.addEventListener('dragleave', () => {
+      item.classList.remove('drag-over');
+    });
+    
+    item.addEventListener('drop', (e) => {
+      e.preventDefault();
+      item.classList.remove('drag-over');
+      const container = document.getElementById('filtersContainer');
+      const dragging = container.querySelector('.dragging');
+      if (dragging && dragging !== item) {
+        const rect = item.getBoundingClientRect();
+        const midY = rect.top + rect.height / 2;
+        if (e.clientY < midY) {
+          container.insertBefore(dragging, item);
+        } else {
+          container.insertBefore(dragging, item.nextSibling);
+        }
+      }
+    });
+  }
+  
+  sortFilters(type) {
+    const container = document.getElementById('filtersContainer');
+    const items = Array.from(container.children);
+    
+    items.sort((a, b) => {
+      const textA = a.querySelector('.filter-text-input').value;
+      const textB = b.querySelector('.filter-text-input').value;
+      if (type === 'alpha') {
+        return textA.localeCompare(textB, 'ru');
+      }
+      return 0; // Keep original order for 'num'
+    });
+    
+    items.forEach(item => container.appendChild(item));
   }
 
   async showDetailedTrainerForm(trainerId = null) {
@@ -1268,13 +1407,63 @@ export class Auth {
       
       // Animations
       enableScrollAnimations: document.getElementById('enableScrollAnimations').checked,
-      animationSpeed: document.getElementById('animationSpeed').value
+      animationSpeed: document.getElementById('animationSpeed').value,
+      
+      // Filters
+      filters: this.collectFiltersData()
     };
 
     localStorage.setItem('siteSettings', JSON.stringify(settings));
     
     // Apply settings immediately
     this.applyContentSettings(settings);
+    
+    // Update filters on page
+    this.updatePageFilters(settings.filters);
+    
+    showToast('Настройки сохранены!', 'success');
+  }
+  
+  collectFiltersData() {
+    const container = document.getElementById('filtersContainer');
+    if (!container) return [];
+    
+    const filters = [];
+    container.querySelectorAll('.admin-filter-item').forEach((item, index) => {
+      filters.push({
+        id: index + 1,
+        text: item.querySelector('.filter-text-input').value,
+        filter: item.querySelector('.filter-value-input').value,
+        color: item.querySelector('.filter-color-input').value,
+        textColor: item.querySelector('.filter-text-color-input').value
+      });
+    });
+    return filters;
+  }
+  
+  updatePageFilters(filters) {
+    const filtersContainer = document.querySelector('.trainers-filters');
+    if (!filtersContainer || !filters || filters.length === 0) return;
+    
+    filtersContainer.innerHTML = filters.map((f, index) => `
+      <button class="filter-btn ${index === 0 ? 'filter-btn--active' : ''}" 
+              data-filter="${f.filter}" 
+              style="background-color: ${f.color}; color: ${f.textColor}; border-color: ${f.color === 'transparent' || f.color === '#3a3a3a' ? '#444' : f.color};">
+        ${f.text}
+      </button>
+    `).join('');
+    
+    // Re-attach event listeners
+    filtersContainer.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const filter = e.target.getAttribute('data-filter');
+        filtersContainer.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('filter-btn--active'));
+        e.target.classList.add('filter-btn--active');
+        
+        // Trigger filter (dispatch custom event)
+        window.dispatchEvent(new CustomEvent('filterChange', { detail: { filter } }));
+      });
+    });
   }
 
   applyContentSettings(settings) {
