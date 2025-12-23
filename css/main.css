@@ -178,30 +178,17 @@ button {
   z-index: 2;
 }
 
-/* Logo Wrapper - Glassmorphism Effect */
+/* Logo Wrapper - Simple container */
 .hero__logo-wrapper {
   position: fixed;
-  top: 15px;
-  left: 15px;
+  top: 10px;
+  left: 10px;
   z-index: 100;
-  padding: 12px 18px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
   transition: all 0.3s ease;
 }
 
 .hero__logo-wrapper:hover {
-  background: rgba(255, 255, 255, 0.15);
   transform: scale(1.02);
-  box-shadow: 
-    0 12px 40px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 /* Logo inside wrapper */
@@ -210,7 +197,7 @@ button {
   top: auto;
   left: auto;
   z-index: 101;
-  opacity: 1;
+  opacity: 0.95;
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
@@ -222,7 +209,7 @@ button {
 .hero__logo img {
   height: 50px;
   width: auto;
-  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
 }
 
 .hero__logo svg {
@@ -233,25 +220,35 @@ button {
   display: none;
 }
 
-/* Logo - Tablet */
-@media (min-width: 768px) and (max-width: 1023px) {
+/* Logo - Tablet landscape */
+@media (min-width: 768px) and (orientation: landscape) {
   .hero__logo-wrapper {
-    top: 20px;
-    left: 20px;
-    padding: 14px 20px;
+    top: 15px;
+    left: 15px;
   }
   
   .hero__logo img {
-    height: 65px;
+    height: 55px;
+  }
+}
+
+/* Logo - Tablet portrait (iPad Mini etc) */
+@media (min-width: 768px) and (orientation: portrait) {
+  .hero__logo-wrapper {
+    top: 8px;
+    left: 8px;
+  }
+  
+  .hero__logo img {
+    height: 50px;
   }
 }
 
 /* Logo - Desktop */
 @media (min-width: 1024px) {
   .hero__logo-wrapper {
-    top: 25px;
-    left: 25px;
-    padding: 15px 22px;
+    top: 20px;
+    left: 20px;
   }
   
   .hero__logo img {
@@ -262,10 +259,8 @@ button {
 /* Logo - Small mobile */
 @media (max-width: 480px) {
   .hero__logo-wrapper {
-    top: 10px;
-    left: 10px;
-    padding: 10px 14px;
-    border-radius: 12px;
+    top: 8px;
+    left: 8px;
   }
   
   .hero__logo img {

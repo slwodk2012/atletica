@@ -26,14 +26,15 @@
   width: 100%;
   overflow: hidden;
   background: #1a1a1a;
-  min-height: 280px;
+  aspect-ratio: 3/4;
+  min-height: 250px;
+  max-height: 450px;
 }
 
 .card__image {
   width: 100%;
-  height: auto;
+  height: 100%;
   display: block;
-  min-height: 280px;
   object-fit: cover;
   object-position: center top;
 }
@@ -42,25 +43,37 @@
   position: absolute;
   top: var(--spacing-sm);
   left: var(--spacing-sm);
+  right: var(--spacing-sm);
   display: flex;
-  gap: var(--spacing-xs);
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 6px;
   z-index: 2;
+  align-items: flex-start;
 }
 
 .card__badge {
   background-color: var(--color-secondary);
   color: var(--color-text-dark);
-  padding: 4px 12px;
-  font-size: 12px;
+  padding: 6px 14px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 
 .card__badge--dark {
   background-color: var(--color-primary);
   color: var(--color-text);
+}
+
+/* Badges horizontal on wider screens */
+@media (min-width: 500px) {
+  .card__badges {
+    flex-direction: row;
+    flex-wrap: wrap;
+    right: auto;
+  }
 }
 
 .card__content {
