@@ -4,7 +4,7 @@
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyB-0Df8QcLF_zhZ6pbQoz7wPOCO-kpkQWU",
+  apiKey: "AIzaSyB-0DfBQcLF_zhZ6pbQoz7wPOCO-kpkQWU",
   authDomain: "atletica-34ab2.firebaseapp.com",
   projectId: "atletica-34ab2",
   storageBucket: "atletica-34ab2.firebasestorage.app",
