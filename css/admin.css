@@ -74,20 +74,29 @@
 }
 
 .side-menu__close {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: transparent;
-  border: none;
-  color: #f4d03f;
-  font-size: 36px;
-  cursor: pointer;
-  line-height: 1;
-  transition: transform 0.3s ease;
+  display: none;
 }
 
-.side-menu__close:hover {
-  transform: rotate(90deg);
+/* Back button in side menu */
+.side-menu__back {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 2px solid #f4d03f;
+  color: #f4d03f;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+  border-radius: 6px;
+}
+
+.side-menu__back:hover {
+  background: #f4d03f;
+  color: #1a1a1a;
 }
 
 .side-menu__nav {

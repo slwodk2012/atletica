@@ -232,11 +232,6 @@ export class Modal {
           }
         }
       }, { passive: true });
-      
-      // Auto slideshow - change every 4 seconds
-      this.slideshowInterval = setInterval(() => {
-        showSlide(currentSlide + 1);
-      }, 4000);
     }
 
     // Thumbnails (images + video at the end)
