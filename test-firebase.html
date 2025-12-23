@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Test</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #1a1a1a; color: white; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        #log { background: #333; padding: 15px; margin-top: 20px; white-space: pre-wrap; max-height: 400px; overflow-y: auto; }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        .info { color: #2196F3; }
+    </style>
+</head>
+<body>
+    <h1>🔥 Firebase Test</h1>
+    
+    <div>
+        <button onclick="testLoad()">1. Загрузить тренеров</button>
+        <button onclick="testSave()">2. Сохранить тест-тренера</button>
+        <button onclick="testDelete()">3. Удалить тест-тренера</button>
+        <button onclick="clearLog()">Очистить лог</button>
+    </div>
+    
+    <div id="log"></div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyH-dDrBQi4F_znZApbQo7aPOCO-kpkDWU",
+            authDomain: "atletica-34ab2.firebaseapp.com",
+            projectId: "atletica-34ab2",
+            storageBucket: "atletica-34ab2.firebasestorage.app",
+            messagingSenderId: "942801359590",
+            appId: "1:942801359590:web:5Ad58ab145e59b2c6be977"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        function log(msg, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `<span class="${type}">[${time}] ${msg}</span>\n`;
+        }
+
+        window.clearLog = () => {
+            document.getElementById('log').innerHTML = '';
+        };
+
+        window.testLoad = async () => {
+            log('Загрузка тренеров из Firebase...', 'info');
+            try {
+                const querySnapshot = await getDocs(collection(db, 'trainers'));
+                const trainers = [];
+                querySnapshot.forEach((doc) => {
+                    trainers.push({ id: doc.id, ...doc.data() });
+                });
+                log(`✅ Загружено ${trainers.length} тренеров:`, 'success');
+                trainers.forEach(t => {
+                    log(`   - ${t.id}: ${t.title}`, 'info');
+                });
+            } catch (error) {
+                log(`❌ Ошибка: ${error.message}`, 'error');
+                log(`Код ошибки: ${error.code}`, 'error');
+            }
+        };
+
+        window.testSave = async () => {
+            log('Сохранение тест-тренера...', 'info');
+            const testTrainer = {
+                id: 'test-trainer-001',
+                title: 'Тест Тренер',
+                description: 'Тестовое описание',
+                category: 'Фитнес',
+                experience: 'Стаж 1 год',
+                image: 'https://via.placeholder.com/400x600',
+                price: 2500,
+                currency: 'RUB'
+            };
+            try {
+                await setDoc(doc(db, 'trainers', testTrainer.id), testTrainer);
+                log(`✅ Тренер сохранен: ${testTrainer.id}`, 'success');
+            } catch (error) {
+                log(`❌ Ошибка сохранения: ${error.message}`, 'error');
+                log(`Код ошибки: ${error.code}`, 'error');
+                if (error.code === 'permission-denied') {
+                    log('⚠️ Нужно настроить правила безопасности в Firebase Console!', 'error');
+                    log('Перейдите в Firebase Console -> Firestore Database -> Rules', 'info');
+                    log('И установите: allow read, write: if true;', 'info');
+                }
+            }
+        };
+
+        window.testDelete = async () => {
+            log('Удаление тест-тренера...', 'info');
+            try {
+                await deleteDoc(doc(db, 'trainers', 'test-trainer-001'));
+                log('✅ Тест-тренер удален', 'success');
+            } catch (error) {
+                log(`❌ Ошибка удаления: ${error.message}`, 'error');
+            }
+        };
+
+        // Auto-test on load
+        log('Firebase инициализирован', 'success');
+        log(`Project ID: ${firebaseConfig.projectId}`, 'info');
+    </script>
+</body>
+</html>

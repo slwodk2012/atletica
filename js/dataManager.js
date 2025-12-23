@@ -11,48 +11,38 @@ export class DataManager {
   }
 
   /**
-   * Load products - from Firebase or JSON file as fallback
+   * Load products - fast JSON first, then sync with Firebase
    * @returns {Promise<Array>} Array of product objects
    */
   async loadProducts() {
     try {
-      // Try Firebase first
+      // Load JSON first (fast)
+      const response = await fetch('data/products.json');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.products && Array.isArray(data.products)) {
+          this.products = data.products;
+          console.log('Loaded from JSON:', this.products.length, 'trainers');
+        }
+      }
+
+      // Then try Firebase (may have newer data)
       if (this.useFirebase) {
         try {
           const trainers = await this.firebase.loadTrainers();
           if (trainers && trainers.length > 0) {
             this.products = trainers;
-            console.log('Loaded from Firebase:', this.products.length, 'trainers');
-            return this.products;
+            console.log('Updated from Firebase:', this.products.length, 'trainers');
+          } else if (this.products.length > 0) {
+            // Firebase empty, initialize with JSON data
+            console.log('Firebase empty, initializing...');
+            // Don't wait for this - do it in background
+            this.firebase.initializeFromJSON(this.products).catch(e => 
+              console.warn('Firebase init error:', e)
+            );
           }
         } catch (fbError) {
-          console.warn('Firebase error, falling back to JSON:', fbError);
-        }
-      }
-
-      // Fallback to JSON file
-      const response = await fetch('data/products.json');
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
-      if (!data.products || !Array.isArray(data.products)) {
-        throw new Error('Invalid data format');
-      }
-      
-      this.products = data.products;
-      console.log('Loaded from JSON:', this.products.length, 'trainers');
-
-      // Initialize Firebase with JSON data if empty
-      if (this.useFirebase) {
-        try {
-          await this.firebase.initializeFromJSON(this.products);
-          console.log('Firebase initialized with JSON data');
-        } catch (e) {
-          console.warn('Could not initialize Firebase:', e);
+          console.warn('Firebase error:', fbError.message);
         }
       }
       
