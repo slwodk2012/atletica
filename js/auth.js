@@ -63,6 +63,16 @@ export class Auth {
       this.currentUser = savedUser;
       this.showAdminMenu();
     }
+    
+    // Clear old undo history to prevent quota issues
+    try {
+      const history = localStorage.getItem('undoHistory');
+      if (history && history.length > 50000) {
+        localStorage.removeItem('undoHistory');
+      }
+    } catch (e) {
+      localStorage.removeItem('undoHistory');
+    }
 
     this.setupEventListeners();
   }
@@ -1393,12 +1403,47 @@ export class Auth {
   }
   
   addToUndoHistory(action) {
-    this.undoHistory.push(action);
-    if (this.undoHistory.length > this.maxUndoSteps) {
+    // Don't save base64 images to avoid quota exceeded
+    const cleanAction = JSON.parse(JSON.stringify(action));
+    if (cleanAction.oldData) {
+      // Remove large base64 data
+      if (cleanAction.oldData.image && cleanAction.oldData.image.startsWith('data:')) {
+        cleanAction.oldData.image = '';
+      }
+      if (cleanAction.oldData.images) {
+        cleanAction.oldData.images = cleanAction.oldData.images.filter(img => !img.startsWith('data:'));
+      }
+    }
+    if (cleanAction.newData) {
+      if (cleanAction.newData.image && cleanAction.newData.image.startsWith('data:')) {
+        cleanAction.newData.image = '';
+      }
+      if (cleanAction.newData.images) {
+        cleanAction.newData.images = cleanAction.newData.images.filter(img => !img.startsWith('data:'));
+      }
+    }
+    
+    this.undoHistory.push(cleanAction);
+    // Keep only last 5 actions
+    if (this.undoHistory.length > 5) {
       this.undoHistory.shift();
     }
-    // Save to localStorage
-    localStorage.setItem('undoHistory', JSON.stringify(this.undoHistory));
+    
+    // Try to save to localStorage, ignore if quota exceeded
+    try {
+      localStorage.setItem('undoHistory', JSON.stringify(this.undoHistory));
+    } catch (e) {
+      console.warn('Could not save undo history:', e.message);
+      // Clear old history if quota exceeded
+      localStorage.removeItem('undoHistory');
+      this.undoHistory = [cleanAction];
+      try {
+        localStorage.setItem('undoHistory', JSON.stringify(this.undoHistory));
+      } catch (e2) {
+        // Give up on localStorage for undo
+        console.warn('Undo history disabled due to storage quota');
+      }
+    }
   }
   
   async undoLastAction() {
