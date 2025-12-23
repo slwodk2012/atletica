@@ -29,11 +29,7 @@ export class DataManager {
       }
       
       // Load from JSON file
-      const response = await fetch('data/products.json', {
-        headers: {
-          'ngrok-skip-browser-warning': 'true'
-        }
-      });
+      const response = await fetch('data/products.json');
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
