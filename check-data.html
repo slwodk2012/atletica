@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Проверка данных тренеров</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #f4d03f;
+        }
+        .info {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .trainer-card {
+            background: #3a3a3a;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border-left: 4px solid #f4d03f;
+        }
+        .trainer-card.invalid {
+            border-left-color: #e74c3c;
+        }
+        .trainer-card h3 {
+            margin: 0 0 10px 0;
+            color: #f4d03f;
+        }
+        .trainer-card.invalid h3 {
+            color: #e74c3c;
+        }
+        .field {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        .field strong {
+            color: #aaa;
+        }
+        .missing {
+            color: #e74c3c;
+        }
+        button {
+            background: #f4d03f;
+            color: #1a1a1a;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            margin: 10px 10px 10px 0;
+        }
+        button:hover {
+            background: #f5d84f;
+        }
+        .danger {
+            background: #e74c3c;
+            color: #fff;
+        }
+        .danger:hover {
+            background: #c0392b;
+        }
+        img {
+            max-width: 200px;
+            max-height: 200px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Проверка данных тренеров</h1>
+        
+        <div class="info">
+            <h2>Статистика</h2>
+            <p><strong>Всего тренеров:</strong> <span id="totalCount">0</span></p>
+            <p><strong>Валидных:</strong> <span id="validCount">0</span></p>
+            <p><strong>С проблемами:</strong> <span id="invalidCount">0</span></p>
+        </div>
+
+        <div>
+            <button onclick="checkData()">🔄 Обновить проверку</button>
+            <button onclick="fixMissingImages()">🔧 Исправить отсутствующие фото</button>
+            <button onclick="window.location.href='index.html'">🏠 На главную</button>
+            <button class="danger" onclick="clearData()">🗑️ Очистить localStorage</button>
+        </div>
+
+        <div id="trainersContainer"></div>
+    </div>
+
+    <script>
+        function checkData() {
+            const data = localStorage.getItem('trainersData');
+            const container = document.getElementById('trainersContainer');
+            container.innerHTML = '';
+
+            if (!data) {
+                container.innerHTML = '<div class="info"><p>❌ Данные не найдены в localStorage</p></div>';
+                document.getElementById('totalCount').textContent = '0';
+                document.getElementById('validCount').textContent = '0';
+                document.getElementById('invalidCount').textContent = '0';
+                return;
+            }
+
+            try {
+                const trainers = JSON.parse(data);
+                console.log('Loaded trainers:', trainers);
+
+                if (!Array.isArray(trainers)) {
+                    container.innerHTML = '<div class="info"><p>❌ Данные не являются массивом</p></div>';
+                    return;
+                }
+
+                let validCount = 0;
+                let invalidCount = 0;
+
+                trainers.forEach((trainer, index) => {
+                    const isValid = validateTrainer(trainer);
+                    if (isValid) validCount++;
+                    else invalidCount++;
+
+                    const card = document.createElement('div');
+                    card.className = `trainer-card ${isValid ? '' : 'invalid'}`;
+                    
+                    let html = `
+                        <h3>${isValid ? '✅' : '❌'} ${trainer.title || 'БЕЗ ИМЕНИ'}</h3>
+                        <div class="field"><strong>ID:</strong> ${trainer.id || '<span class="missing">ОТСУТСТВУЕТ</span>'}</div>
+                        <div class="field"><strong>Описание:</strong> ${trainer.description || '<span class="missing">ОТСУТСТВУЕТ</span>'}</div>
+                        <div class="field"><strong>Категория:</strong> ${trainer.category || '<span class="missing">ОТСУТСТВУЕТ</span>'}</div>
+                        <div class="field"><strong>Опыт:</strong> ${trainer.experience || '<span class="missing">ОТСУТСТВУЕТ</span>'}</div>
+                        <div class="field"><strong>Цена:</strong> ${trainer.price || '<span class="missing">ОТСУТСТВУЕТ</span>'}</div>
+                    `;
+
+                    if (trainer.image) {
+                        html += `<div class="field"><strong>Главное фото:</strong><br><img src="${trainer.image}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23e74c3c%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 fill=%22%23fff%22%3EОШИБКА%3C/text%3E%3C/svg%3E'"></div>`;
+                    } else {
+                        html += `<div class="field"><strong>Главное фото:</strong> <span class="missing">ОТСУТСТВУЕТ ❌</span></div>`;
+                    }
+
+                    if (trainer.images && trainer.images.length > 0) {
+                        html += `<div class="field"><strong>Дополнительные фото:</strong> ${trainer.images.length} шт.</div>`;
+                    }
+
+                    card.innerHTML = html;
+                    container.appendChild(card);
+                });
+
+                document.getElementById('totalCount').textContent = trainers.length;
+                document.getElementById('validCount').textContent = validCount;
+                document.getElementById('invalidCount').textContent = invalidCount;
+
+            } catch (e) {
+                container.innerHTML = `<div class="info"><p>❌ Ошибка парсинга данных: ${e.message}</p></div>`;
+                console.error('Parse error:', e);
+            }
+        }
+
+        function validateTrainer(trainer) {
+            if (!trainer) return false;
+            if (!trainer.id || !trainer.title || !trainer.description) return false;
+            if (!trainer.image || trainer.image.trim() === '') return false;
+            if (typeof trainer.price !== 'number') return false;
+            return true;
+        }
+
+        function fixMissingImages() {
+            const data = localStorage.getItem('trainersData');
+            if (!data) {
+                alert('Нет данных для исправления');
+                return;
+            }
+
+            try {
+                const trainers = JSON.parse(data);
+                let fixed = 0;
+
+                trainers.forEach(trainer => {
+                    if (!trainer.image || trainer.image.trim() === '') {
+                        trainer.image = 'https://via.placeholder.com/400x600/3a3a3a/f4d03f?text=' + encodeURIComponent(trainer.title || 'Тренер');
+                        fixed++;
+                    }
+                });
+
+                localStorage.setItem('trainersData', JSON.stringify(trainers));
+                alert(`✅ Исправлено ${fixed} тренеров`);
+                checkData();
+            } catch (e) {
+                alert('❌ Ошибка: ' + e.message);
+            }
+        }
+
+        function clearData() {
+            if (confirm('⚠️ ВНИМАНИЕ! Это удалит ВСЕ данные тренеров из localStorage.\n\nПродолжить?')) {
+                if (confirm('Вы уверены? Это действие нельзя отменить!')) {
+                    localStorage.removeItem('trainersData');
+                    alert('✅ Данные удалены. Перезагрузите главную страницу.');
+                    checkData();
+                }
+            }
+        }
+
+        // Auto-check on load
+        checkData();
+    </script>
+</body>
+</html>

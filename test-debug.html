@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Test</title>
+    <style>
+        body {
+            background: #1a1a1a;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .test-section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #ff4444; }
+        button {
+            background: #f4d03f;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug Test Page</h1>
+    
+    <div class="test-section">
+        <h2>1. Проверка загрузки данных</h2>
+        <button onclick="testDataLoad()">Загрузить данные</button>
+        <div id="dataResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Проверка localStorage</h2>
+        <button onclick="checkLocalStorage()">Проверить localStorage</button>
+        <button onclick="clearLocalStorage()">Очистить localStorage</button>
+        <div id="storageResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Проверка гамбургер-меню</h2>
+        <button onclick="testHamburger()">Тест меню</button>
+        <div id="hamburgerResult"></div>
+    </div>
+
+    <script type="module">
+        window.testDataLoad = async function() {
+            const result = document.getElementById('dataResult');
+            try {
+                const response = await fetch('data/products.json');
+                const data = await response.json();
+                result.innerHTML = `<p class="success">✅ Загружено ${data.products.length} тренеров</p>`;
+                console.log('Data:', data);
+            } catch (error) {
+                result.innerHTML = `<p class="error">❌ Ошибка: ${error.message}</p>`;
+                console.error(error);
+            }
+        };
+
+        window.checkLocalStorage = function() {
+            const result = document.getElementById('storageResult');
+            const trainersData = localStorage.getItem('trainersData');
+            if (trainersData) {
+                try {
+                    const data = JSON.parse(trainersData);
+                    const count = Array.isArray(data) ? data.length : (data.products ? data.products.length : 0);
+                    result.innerHTML = `<p class="success">✅ В localStorage: ${count} тренеров</p>`;
+                    console.log('localStorage data:', data);
+                } catch (e) {
+                    result.innerHTML = `<p class="error">❌ Ошибка парсинга: ${e.message}</p>`;
+                }
+            } else {
+                result.innerHTML = `<p>⚠️ localStorage пуст</p>`;
+            }
+        };
+
+        window.clearLocalStorage = function() {
+            localStorage.removeItem('trainersData');
+            document.getElementById('storageResult').innerHTML = `<p class="success">✅ localStorage очищен</p>`;
+        };
+
+        window.testHamburger = function() {
+            const result = document.getElementById('hamburgerResult');
+            const hamburger = document.getElementById('hamburger');
+            const sideMenu = document.getElementById('sideMenu');
+            
+            if (hamburger && sideMenu) {
+                result.innerHTML = `<p class="success">✅ Элементы меню найдены</p>`;
+            } else {
+                result.innerHTML = `<p class="error">❌ Элементы меню не найдены</p>`;
+            }
+        };
+
+        // Auto-run tests
+        window.addEventListener('DOMContentLoaded', () => {
+            testDataLoad();
+            checkLocalStorage();
+        });
+    </script>
+</body>
+</html>

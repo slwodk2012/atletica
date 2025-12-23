@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Автоматическое исправление</title>
+    <style>
+        body {
+            background: #1a1a1a;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            padding: 40px 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .container {
+            background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        h1 {
+            color: #f4d03f;
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+        .status {
+            font-size: 18px;
+            margin: 30px 0;
+            padding: 20px;
+            border-radius: 10px;
+            background: #2a2a2a;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #ff4444; }
+        .info { color: #2196F3; }
+        .warning { color: #ff9800; }
+        .progress {
+            width: 100%;
+            height: 30px;
+            background: #2a2a2a;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #f4d03f 0%, #d4b02f 100%);
+            width: 0%;
+            transition: width 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-weight: bold;
+        }
+        button {
+            background: #f4d03f;
+            color: #000;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 20px 10px;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: #d4b02f;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(244, 208, 63, 0.3);
+        }
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .icon {
+            font-size: 64px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">🔧</div>
+        <h1>Автоматическое исправление</h1>
+        
+        <div class="status" id="status">
+            <p class="warning">⚠️ Обнаружены поврежденные данные</p>
+            <p>Нажмите кнопку для автоматического исправления</p>
+        </div>
+        
+        <div class="progress" id="progressContainer" style="display: none;">
+            <div class="progress-bar" id="progressBar">0%</div>
+        </div>
+        
+        <button onclick="autoFix()" id="fixBtn">🔄 ИСПРАВИТЬ АВТОМАТИЧЕСКИ</button>
+        <button onclick="goToMain()" id="mainBtn" style="display: none;">✅ ПЕРЕЙТИ НА ГЛАВНУЮ</button>
+    </div>
+
+    <script>
+        async function autoFix() {
+            const status = document.getElementById('status');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+            const fixBtn = document.getElementById('fixBtn');
+            const mainBtn = document.getElementById('mainBtn');
+            
+            fixBtn.disabled = true;
+            progressContainer.style.display = 'block';
+            
+            try {
+                // Шаг 1: Очистка localStorage
+                status.innerHTML = '<p class="info">🗑️ Очистка поврежденных данных...</p>';
+                progressBar.style.width = '25%';
+                progressBar.textContent = '25%';
+                await sleep(500);
+                
+                localStorage.removeItem('trainersData');
+                
+                // Шаг 2: Загрузка исходных данных
+                status.innerHTML = '<p class="info">📥 Загрузка исходных данных...</p>';
+                progressBar.style.width = '50%';
+                progressBar.textContent = '50%';
+                await sleep(500);
+                
+                const response = await fetch('data/products.json');
+                const data = await response.json();
+                
+                // Шаг 3: Сохранение чистых данных
+                status.innerHTML = '<p class="info">💾 Сохранение чистых данных...</p>';
+                progressBar.style.width = '75%';
+                progressBar.textContent = '75%';
+                await sleep(500);
+                
+                localStorage.setItem('trainersData', JSON.stringify(data.products));
+                
+                // Шаг 4: Проверка
+                status.innerHTML = '<p class="info">✔️ Проверка данных...</p>';
+                progressBar.style.width = '100%';
+                progressBar.textContent = '100%';
+                await sleep(500);
+                
+                const saved = JSON.parse(localStorage.getItem('trainersData'));
+                
+                // Готово!
+                status.innerHTML = `
+                    <p class="success">✅ Исправление завершено!</p>
+                    <p>Восстановлено ${saved.length} тренеров</p>
+                    <p class="info">Все данные теперь в порядке</p>
+                `;
+                
+                mainBtn.style.display = 'inline-block';
+                
+            } catch (error) {
+                status.innerHTML = `<p class="error">❌ Ошибка: ${error.message}</p>`;
+                fixBtn.disabled = false;
+            }
+        }
+        
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        function goToMain() {
+            window.location.href = 'index.html';
+        }
+        
+        // Проверка при загрузке
+        window.addEventListener('DOMContentLoaded', () => {
+            const trainers = JSON.parse(localStorage.getItem('trainersData') || '[]');
+            if (trainers.length > 0) {
+                const damaged = trainers.filter(t => t.title.includes('ОБНОВЛЕНО:')).length;
+                if (damaged > 0) {
+                    document.getElementById('status').innerHTML = `
+                        <p class="warning">⚠️ Обнаружено ${damaged} поврежденных записей</p>
+                        <p>Нажмите кнопку для автоматического исправления</p>
+                    `;
+                } else {
+                    document.getElementById('status').innerHTML = `
+                        <p class="success">✅ Данные в порядке!</p>
+                        <p>Исправление не требуется</p>
+                    `;
+                    document.getElementById('fixBtn').textContent = '🏠 ПЕРЕЙТИ НА ГЛАВНУЮ';
+                    document.getElementById('fixBtn').onclick = goToMain;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

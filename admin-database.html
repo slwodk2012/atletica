@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление базой тренеров</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            background: #1a1a1a; 
+            color: #fff; 
+            font-family: Arial, sans-serif; 
+            padding: 20px;
+            margin: 0;
+        }
+        h1 { color: #f4d03f; margin-bottom: 10px; }
+        h2 { color: #f4d03f; margin-top: 30px; }
+        .info { background: #333; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .info p { margin: 5px 0; }
+        .buttons { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        button { 
+            padding: 12px 24px; 
+            cursor: pointer; 
+            background: #f4d03f; 
+            border: none; 
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+        button:hover { background: #e6c230; }
+        button.danger { background: #e74c3c; color: #fff; }
+        button.danger:hover { background: #c0392b; }
+        button.success { background: #27ae60; color: #fff; }
+        button.success:hover { background: #219a52; }
+        textarea { 
+            width: 100%; 
+            height: 400px; 
+            background: #2a2a2a; 
+            color: #fff; 
+            border: 1px solid #444;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            border-radius: 5px;
+        }
+        .status { padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .status.success { background: #27ae60; }
+        .status.error { background: #e74c3c; }
+        .trainer-list { 
+            background: #2a2a2a; 
+            padding: 15px; 
+            border-radius: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .trainer-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid #444;
+        }
+        .trainer-item:last-child { border-bottom: none; }
+        .trainer-item button { padding: 5px 10px; font-size: 12px; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <h1>Управление базой тренеров</h1>
+    
+    <div class="info">
+        <p><strong>Как это работает:</strong></p>
+        <p>1. Данные хранятся в файле <code>data/products.json</code></p>
+        <p>2. Резервная копия: <code>data/products-backup.json</code></p>
+        <p>3. Чтобы добавить/изменить тренера - редактируйте JSON и нажмите "Сохранить в файл"</p>
+        <p>4. После сохранения скопируйте JSON и вставьте в файл <code>data/products.json</code></p>
+    </div>
+
+    <div class="buttons">
+        <button onclick="loadFromFile()">Загрузить из файла</button>
+        <button onclick="loadFromBackup()">Загрузить из резервной копии</button>
+        <button class="success" onclick="copyJSON()">Скопировать JSON</button>
+        <button class="danger" onclick="resetToBackup()">Сбросить к резервной копии</button>
+    </div>
+
+    <div id="status"></div>
+
+    <h2>Список тренеров (<span id="count">0</span>)</h2>
+    <div class="trainer-list" id="trainerList"></div>
+
+    <h2>Добавить нового тренера</h2>
+    <div class="buttons">
+        <button onclick="showAddForm()">+ Добавить тренера</button>
+    </div>
+    
+    <div id="addForm" class="hidden">
+        <div style="background: #333; padding: 20px; border-radius: 8px; margin: 10px 0;">
+            <div style="margin-bottom: 10px;">
+                <label>Имя: <input type="text" id="newName" style="width: 200px; padding: 5px;"></label>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label>Описание: <input type="text" id="newDesc" style="width: 300px; padding: 5px;"></label>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label>Категория: 
+                    <select id="newCategory" style="padding: 5px;">
+                        <option>Фитнес</option>
+                        <option>Кроссфит</option>
+                        <option>Бодибилдинг</option>
+                        <option>Бокс</option>
+                        <option>Единоборства</option>
+                        <option>Пауэрлифтинг</option>
+                        <option>Йога</option>
+                        <option>Плавание</option>
+                        <option>Стретчинг</option>
+                    </select>
+                </label>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label>Стаж: <input type="text" id="newExp" value="Стаж 5 лет" style="width: 150px; padding: 5px;"></label>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label>URL фото: <input type="text" id="newPhoto" style="width: 400px; padding: 5px;" placeholder="https://..."></label>
+            </div>
+            <button class="success" onclick="addTrainer()">Добавить</button>
+            <button onclick="hideAddForm()">Отмена</button>
+        </div>
+    </div>
+
+    <h2>JSON данные</h2>
+    <textarea id="jsonData"></textarea>
+
+    <script>
+        let trainers = [];
+
+        async function loadFromFile() {
+            try {
+                const response = await fetch('data/products.json?' + Date.now());
+                const data = await response.json();
+                trainers = data.products || [];
+                updateUI();
+                showStatus('Загружено ' + trainers.length + ' тренеров из файла', 'success');
+            } catch (e) {
+                showStatus('Ошибка загрузки: ' + e.message, 'error');
+            }
+        }
+
+        async function loadFromBackup() {
+            try {
+                const response = await fetch('data/products-backup.json?' + Date.now());
+                const data = await response.json();
+                trainers = data.products || [];
+                updateUI();
+                showStatus('Загружено ' + trainers.length + ' тренеров из резервной копии', 'success');
+            } catch (e) {
+                showStatus('Ошибка загрузки резервной копии: ' + e.message, 'error');
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('count').textContent = trainers.length;
+            
+            // Update trainer list
+            const list = document.getElementById('trainerList');
+            list.innerHTML = trainers.map((t, i) => `
+                <div class="trainer-item">
+                    <span>${i + 1}. ${t.title} (${t.category}) - ${t.id}</span>
+                    <button class="danger" onclick="deleteTrainer('${t.id}')">Удалить</button>
+                </div>
+            `).join('');
+
+            // Update JSON
+            document.getElementById('jsonData').value = JSON.stringify({ products: trainers }, null, 2);
+        }
+
+        function deleteTrainer(id) {
+            if (!confirm('Удалить тренера?')) return;
+            trainers = trainers.filter(t => t.id !== id);
+            updateUI();
+            showStatus('Тренер удален. Скопируйте JSON и сохраните в файл!', 'success');
+        }
+
+        function showAddForm() {
+            document.getElementById('addForm').classList.remove('hidden');
+        }
+
+        function hideAddForm() {
+            document.getElementById('addForm').classList.add('hidden');
+        }
+
+        function addTrainer() {
+            const name = document.getElementById('newName').value.trim();
+            const desc = document.getElementById('newDesc').value.trim();
+            const category = document.getElementById('newCategory').value;
+            const exp = document.getElementById('newExp').value.trim();
+            const photo = document.getElementById('newPhoto').value.trim() || 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=600&fit=crop';
+
+            if (!name) {
+                alert('Введите имя тренера');
+                return;
+            }
+
+            // Generate new ID
+            const maxNum = trainers.reduce((max, t) => {
+                const num = parseInt(t.id.replace('prod-', '')) || 0;
+                return num > max ? num : max;
+            }, 0);
+            const newId = 'prod-' + String(maxNum + 1).padStart(3, '0');
+
+            const newTrainer = {
+                id: newId,
+                title: name,
+                description: desc || 'Персональный тренер',
+                category: category,
+                experience: exp,
+                price: 2500,
+                currency: 'RUB',
+                image: photo,
+                imageAlt: 'Тренер ' + name,
+                images: [photo],
+                detailedDescription: '',
+                specialization: [],
+                education: ''
+            };
+
+            trainers.push(newTrainer);
+            updateUI();
+            hideAddForm();
+            
+            // Clear form
+            document.getElementById('newName').value = '';
+            document.getElementById('newDesc').value = '';
+            document.getElementById('newPhoto').value = '';
+
+            showStatus('Тренер добавлен! Скопируйте JSON и сохраните в файл data/products.json', 'success');
+        }
+
+        function copyJSON() {
+            const json = document.getElementById('jsonData').value;
+            navigator.clipboard.writeText(json).then(() => {
+                showStatus('JSON скопирован! Вставьте его в файл data/products.json', 'success');
+            }).catch(() => {
+                document.getElementById('jsonData').select();
+                showStatus('Выделите текст и скопируйте вручную (Ctrl+C)', 'error');
+            });
+        }
+
+        async function resetToBackup() {
+            if (!confirm('Сбросить все изменения к резервной копии?')) return;
+            await loadFromBackup();
+            showStatus('Данные сброшены к резервной копии. Скопируйте JSON и сохраните в файл!', 'success');
+        }
+
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.innerHTML = `<div class="status ${type}">${message}</div>`;
+            setTimeout(() => status.innerHTML = '', 5000);
+        }
+
+        // Load on start
+        loadFromFile();
+    </script>
+</body>
+</html>

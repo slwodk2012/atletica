@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚠️ СТОП! НЕ ИСПОЛЬЗУЙТЕ ЭТУ СТРАНИЦУ!</title>
+    <script>
+        // Автоматическое перенаправление через 3 секунды
+        let countdown = 3;
+        const timer = setInterval(() => {
+            countdown--;
+            const el = document.getElementById('countdown');
+            if (el) el.textContent = countdown;
+            if (countdown <= 0) {
+                clearInterval(timer);
+                window.location.href = 'START_HERE.html';
+            }
+        }, 1000);
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #1a1a1a;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 20px;
+        }
+        .warning-container {
+            background: #ff4444;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(255, 68, 68, 0.5);
+            max-width: 600px;
+        }
+        h1 {
+            font-size: 48px;
+            margin-bottom: 30px;
+        }
+        p {
+            font-size: 24px;
+            margin: 20px 0;
+        }
+        .countdown {
+            font-size: 72px;
+            font-weight: bold;
+            color: #fff;
+            margin: 30px 0;
+        }
+        a {
+            display: inline-block;
+            background: #fff;
+            color: #ff4444;
+            padding: 20px 40px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+        a:hover {
+            background: #f4d03f;
+            color: #000;
+            transform: translateY(-3px);
+        }
+    </style>
+</head>
+<body>
+    <div class="warning-container">
+        <h1>⚠️ СТОП!</h1>
+        <p><strong>ЭТА СТРАНИЦА ПОВРЕЖДАЕТ ДАННЫЕ!</strong></p>
+        <p>НЕ ИСПОЛЬЗУЙТЕ ЕЁ!</p>
+        
+        <div class="countdown">
+            <span id="countdown">3</span>
+        </div>
+        
+        <p>Перенаправление через <span id="countdown">3</span> секунды...</p>
+        
+        <div style="margin-top: 30px;">
+            <a href="START_HERE.html">ПЕРЕЙТИ СЕЙЧАС</a>
+            <br>
+            <a href="index.html">ОСНОВНОЙ САЙТ</a>
+        </div>
+    </div>
+</body>
+</html>

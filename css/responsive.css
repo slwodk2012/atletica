@@ -1,0 +1,569 @@
+/* Responsive Grid Layout - Desktop по умолчанию */
+.gallery-container {
+  display: grid;
+  gap: var(--spacing-md);
+  grid-template-columns: repeat(4, 1fr);
+  padding: var(--spacing-md);
+}
+
+/* Mobile First - Small Mobile (<480px) */
+@media (max-width: 479px) {
+  .gallery-container {
+    grid-template-columns: 1fr;
+    padding: var(--spacing-sm);
+  }
+}
+
+/* Mobile (480px - 767px) */
+@media (min-width: 480px) and (max-width: 767px) {
+  .gallery-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-sm);
+  }
+}
+
+/* Tablet (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .gallery-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 20px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .trainers-section {
+    padding: 40px 0;
+  }
+  
+  .trainers-header {
+    max-width: 100%;
+    padding: 0 20px 30px;
+  }
+}
+
+/* Desktop (≥1024px) */
+@media (min-width: 1024px) {
+  .gallery-container {
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-lg);
+    padding: var(--spacing-lg);
+  }
+}
+
+/* Touch Target Sizes for Mobile */
+@media (max-width: 767px) {
+  .card {
+    min-height: 44px;
+  }
+  
+  .modal__close {
+    min-width: 48px;
+    min-height: 48px;
+  }
+  
+  .card__button {
+    min-height: 48px;
+    font-size: 14px;
+  }
+  
+  .site-title {
+    font-size: 24px;
+  }
+}
+
+/* Tablet Optimizations */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .card__title {
+    font-size: 20px;
+  }
+  
+  .card__description {
+    font-size: 14px;
+  }
+}
+
+/* Modal Responsive Adjustments */
+@media (max-width: 767px) {
+  .modal__content {
+    width: 95%;
+    max-height: 95vh;
+  }
+  
+  .modal__body {
+    padding: var(--spacing-md);
+  }
+  
+  .modal__title {
+    font-size: 24px;
+  }
+  
+  .modal__price {
+    font-size: 20px;
+  }
+  
+  .modal__button {
+    padding: 14px;
+    font-size: 14px;
+  }
+}
+
+/* Landscape Mobile */
+@media (max-width: 767px) and (orientation: landscape) {
+  .modal__content {
+    max-height: 90vh;
+  }
+}
+
+/* ===== УЛУЧШЕННАЯ АДАПТИВНОСТЬ ===== */
+
+/* Hero Section - Mobile */
+@media (max-width: 767px) {
+  .hero {
+    min-height: 100vh;
+    padding: 80px 15px 40px;
+  }
+  
+  .hero__logo {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    padding: 10px 15px;
+    border-radius: 30px;
+  }
+  
+  .hero__logo svg {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .hero__logo-text {
+    font-size: 16px;
+    letter-spacing: 2px;
+  }
+  
+  .hero__title {
+    font-size: clamp(28px, 10vw, 40px);
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+  }
+  
+  .hero__subtitle {
+    font-size: clamp(14px, 4vw, 16px);
+    margin-bottom: 30px;
+    padding: 0 10px;
+  }
+  
+  .hero__button {
+    padding: 18px 35px;
+    font-size: 14px;
+    letter-spacing: 1px;
+    width: 100%;
+    max-width: 300px;
+    justify-content: center;
+  }
+}
+
+/* Hero Section - Tablet */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .hero {
+    padding: 80px 0 60px;
+    min-height: 100vh;
+    width: 100%;
+  }
+  
+  .hero__container {
+    padding: 0 30px;
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .hero__logo {
+    top: 20px;
+    left: 20px;
+    padding: 12px 20px;
+  }
+  
+  .hero__logo svg {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .hero__logo-text {
+    font-size: 20px;
+    letter-spacing: 3px;
+  }
+  
+  .hero__title {
+    font-size: clamp(45px, 7vw, 65px);
+    letter-spacing: 2px;
+  }
+  
+  .hero__subtitle {
+    font-size: clamp(16px, 2.5vw, 20px);
+    margin-bottom: 40px;
+  }
+  
+  .hero__button {
+    padding: 20px 45px;
+    font-size: 18px;
+  }
+}
+
+/* Trainers Section - Mobile */
+@media (max-width: 767px) {
+  .trainers-section {
+    padding: 40px 15px;
+  }
+  
+  .trainers-header {
+    margin-bottom: 30px;
+  }
+  
+  .trainers-title {
+    font-size: clamp(24px, 8vw, 36px);
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+  }
+  
+  .trainers-title__icon svg {
+    width: 60px;
+    height: 30px;
+  }
+  
+  .trainers-subtitle {
+    font-size: clamp(13px, 3.5vw, 15px);
+    margin-bottom: 25px;
+  }
+  
+  .trainers-filters {
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+  
+  .filter-btn {
+    padding: 10px 16px;
+    font-size: 12px;
+    flex: 0 1 auto;
+    min-width: auto;
+  }
+}
+
+/* Trainers Section - Tablet */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .trainers-section {
+    padding: 60px 20px;
+  }
+  
+  .trainers-header {
+    padding: 0 20px 30px;
+  }
+  
+  .trainers-title {
+    font-size: clamp(36px, 6vw, 52px);
+    letter-spacing: 2px;
+  }
+  
+  .trainers-subtitle {
+    font-size: clamp(15px, 2vw, 18px);
+  }
+  
+  .filter-btn {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+}
+
+/* Cards - Mobile */
+@media (max-width: 767px) {
+  .gallery-container {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px 15px;
+  }
+  
+  .card {
+    max-width: 100%;
+  }
+  
+  .card__image {
+    height: 350px;
+  }
+  
+  .card__title {
+    font-size: 22px;
+  }
+  
+  .card__description {
+    font-size: 14px;
+  }
+  
+  .card__actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .card__button {
+    width: 100%;
+    justify-content: center;
+    padding: 14px 20px;
+    font-size: 13px;
+  }
+}
+
+/* Cards - Tablet */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .gallery-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+    padding: 30px 20px;
+    width: 100%;
+  }
+  
+  .card {
+    width: 100%;
+  }
+  
+  .card__image-wrapper {
+    padding-top: 140%;
+  }
+  
+  .card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .card__title {
+    font-size: 22px;
+  }
+  
+  .card__description {
+    font-size: 14px;
+  }
+}
+
+/* Gym Section - Mobile */
+@media (max-width: 767px) {
+  .gym-section {
+    padding: 40px 15px;
+  }
+  
+  .gym-container {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .gym-card {
+    height: 300px;
+  }
+  
+  .gym-card__title {
+    font-size: 28px;
+  }
+  
+  .gym-card__label {
+    font-size: 12px;
+  }
+}
+
+/* Gym Section - Tablet */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .gym-section {
+    padding: 60px 30px;
+  }
+  
+  .gym-container {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .gym-card {
+    height: 350px;
+  }
+}
+
+/* Modal - Mobile */
+@media (max-width: 767px) {
+  .modal__content {
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    max-height: 100%;
+    border-radius: 0;
+    margin: 0;
+  }
+  
+  .modal__close {
+    top: 10px;
+    right: 10px;
+    width: 44px;
+    height: 44px;
+    font-size: 28px;
+  }
+  
+  .modal__body {
+    padding: 60px 20px 20px;
+  }
+  
+  .modal__image-gallery {
+    height: 250px;
+  }
+  
+  .modal__title {
+    font-size: 26px;
+  }
+  
+  .modal__price {
+    font-size: 22px;
+  }
+  
+  .modal__section-title {
+    font-size: 18px;
+  }
+  
+  .modal__button {
+    padding: 16px;
+    font-size: 15px;
+  }
+}
+
+/* Modal - Tablet */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .modal__content {
+    width: 90%;
+    max-width: 700px;
+  }
+  
+  .modal__image-gallery {
+    height: 350px;
+  }
+  
+  .modal__title {
+    font-size: 32px;
+  }
+}
+
+/* Hamburger Menu - Mobile */
+@media (max-width: 767px) {
+  .hamburger-menu {
+    top: 15px;
+    right: 15px;
+  }
+  
+  .hamburger {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .side-menu {
+    width: 100%;
+    right: -100%;
+  }
+  
+  .side-menu.active {
+    right: 0;
+  }
+  
+  .side-menu__content {
+    padding: 60px 20px 30px;
+  }
+  
+  .side-menu__link {
+    padding: 16px 20px;
+    font-size: 16px;
+  }
+}
+
+/* Landscape Mobile */
+@media (max-width: 767px) and (orientation: landscape) {
+  .hero {
+    min-height: auto;
+    padding: 60px 15px 30px;
+  }
+  
+  .hero__title {
+    font-size: clamp(24px, 8vw, 32px);
+    margin-bottom: 15px;
+  }
+  
+  .hero__subtitle {
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+  
+  .hero__button {
+    padding: 14px 30px;
+    font-size: 13px;
+  }
+}
+
+/* Large Desktop (≥1440px) */
+@media (min-width: 1440px) {
+  .hero__container {
+    max-width: 1400px;
+  }
+  
+  .hero__title {
+    font-size: 90px;
+  }
+  
+  .hero__subtitle {
+    font-size: 24px;
+  }
+  
+  .hero__button {
+    padding: 24px 60px;
+    font-size: 22px;
+  }
+  
+  .gallery-container {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 35px;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .hamburger-menu,
+  .side-menu,
+  .hero__button,
+  .card__button,
+  .modal__close {
+    display: none;
+  }
+  
+  .hero {
+    min-height: auto;
+    page-break-after: always;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .hero__title,
+  .trainers-title {
+    text-shadow: none;
+  }
+  
+  .card {
+    border: 2px solid var(--color-secondary);
+  }
+}

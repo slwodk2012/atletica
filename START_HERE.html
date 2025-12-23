@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏠 НАЧНИТЕ ЗДЕСЬ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            color: #fff;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 48px;
+            color: #f4d03f;
+            margin-bottom: 30px;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.5);
+        }
+        .warning {
+            background: #ff4444;
+            padding: 30px;
+            border-radius: 20px;
+            margin: 30px 0;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(255, 68, 68, 0.3);
+        }
+        .success {
+            background: #4CAF50;
+            padding: 30px;
+            border-radius: 20px;
+            margin: 30px 0;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3);
+        }
+        .button {
+            display: inline-block;
+            background: #f4d03f;
+            color: #000;
+            padding: 25px 50px;
+            border-radius: 15px;
+            text-decoration: none;
+            font-size: 28px;
+            font-weight: bold;
+            margin: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(244, 208, 63, 0.3);
+        }
+        .button:hover {
+            background: #d4b02f;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(244, 208, 63, 0.5);
+        }
+        .button-danger {
+            background: #ff4444;
+            color: #fff;
+        }
+        .button-danger:hover {
+            background: #cc0000;
+        }
+        .steps {
+            background: #2a2a2a;
+            padding: 40px;
+            border-radius: 20px;
+            margin: 30px 0;
+            text-align: left;
+        }
+        .step {
+            font-size: 20px;
+            margin: 20px 0;
+            padding: 20px;
+            background: #1a1a1a;
+            border-radius: 10px;
+            border-left: 5px solid #f4d03f;
+        }
+        .icon {
+            font-size: 80px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">🏠</div>
+        <h1>НАЧНИТЕ ЗДЕСЬ</h1>
+        
+        <div class="warning">
+            ⚠️ ЗАКРОЙТЕ ВСЕ ТЕСТОВЫЕ СТРАНИЦЫ!
+            <br><br>
+            Если в адресной строке видите "test-" - ЗАКРОЙТЕ ЭТУ ВКЛАДКУ!
+        </div>
+        
+        <div class="steps">
+            <h2 style="color: #f4d03f; font-size: 32px; margin-bottom: 30px;">📋 Что делать:</h2>
+            
+            <div class="step">
+                <strong>ШАГ 1:</strong> Исправьте данные
+                <br>
+                <a href="AUTO_FIX.html" class="button" style="margin-top: 15px; font-size: 20px;">
+                    🔧 ИСПРАВИТЬ ДАННЫЕ
+                </a>
+            </div>
+            
+            <div class="step">
+                <strong>ШАГ 2:</strong> Откройте основной сайт
+                <br>
+                <a href="index.html" class="button" style="margin-top: 15px; font-size: 20px;">
+                    🏠 ОСНОВНОЙ САЙТ
+                </a>
+            </div>
+            
+            <div class="step">
+                <strong>ШАГ 3:</strong> Войдите в админку
+                <br>
+                <span style="color: #f4d03f;">Логин: admin | Пароль: admin123</span>
+            </div>
+        </div>
+        
+        <div class="success">
+            ✅ ИСПОЛЬЗУЙТЕ ТОЛЬКО ОСНОВНОЙ САЙТ
+            <br><br>
+            НЕ ОТКРЫВАЙТЕ test-save.html!
+        </div>
+        
+        <div style="margin-top: 40px;">
+            <a href="index.html" class="button">
+                🚀 ПЕРЕЙТИ К РАБОТЕ
+            </a>
+        </div>
+        
+        <div style="margin-top: 40px; font-size: 18px; color: #999;">
+            <p>Добавьте в закладки:</p>
+            <p>🏠 <a href="index.html" style="color: #f4d03f;">Основной сайт</a></p>
+            <p>🔧 <a href="AUTO_FIX.html" style="color: #f4d03f;">Исправление</a></p>
+        </div>
+    </div>
+</body>
+</html>

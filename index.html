@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Титулованный Тренерский Состав</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/cards.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <style>
+        /* Исправление для планшета - убираем пустое место справа */
+        html, body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Location Block - БЕЗ РАМКИ */
+        .location-block {
+            display: inline-flex !important;
+            align-items: baseline !important;
+            gap: 10px !important;
+            margin: 25px auto !important;
+            padding: 0 !important;
+            border: none !important;
+            background: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        
+        .location-block__ul {
+            font-size: 14px !important;
+            font-weight: 400 !important;
+            color: rgba(255, 255, 255, 0.6) !important;
+            margin-right: 5px !important;
+        }
+        
+        .location-block__street {
+            font-size: 28px !important;
+            font-weight: 700 !important;
+            color: #f4d03f !important;
+            margin-right: 10px !important;
+        }
+        
+        .location-block__number {
+            font-size: 32px !important;
+            font-weight: 900 !important;
+            color: #f4d03f !important;
+            margin-right: 15px !important;
+        }
+        
+        .location-block__floor {
+            font-size: 16px !important;
+            font-weight: 400 !important;
+            color: rgba(255, 255, 255, 0.6) !important;
+        }
+        
+        /* По умолчанию показываем полный заголовок */
+        .title-desktop { display: inline; }
+        .title-tablet { display: none; }
+        
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .gallery-container {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 20px !important;
+                padding: 20px !important;
+                max-width: 100% !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            
+            .trainers-section,
+            .hero,
+            .gym-section {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            
+            .trainers-header {
+                max-width: 100% !important;
+                padding: 0 20px 30px !important;
+            }
+            
+            /* Заголовок секции тренеров - меньше для планшета */
+            .trainers-title {
+                font-size: 22px !important;
+                letter-spacing: 1px !important;
+                flex-wrap: wrap !important;
+                justify-content: center !important;
+                gap: 8px !important;
+                white-space: normal !important;
+                line-height: 1.4 !important;
+                padding: 0 15px !important;
+            }
+            
+            .trainers-title__icon {
+                display: none !important;
+            }
+            
+            /* Показываем короткий заголовок на планшете */
+            .title-desktop {
+                display: none !important;
+            }
+            .title-tablet {
+                display: inline !important;
+            }
+            
+            /* Админка - адаптация для планшета */
+            .modal__content--large {
+                width: 95% !important;
+                max-width: 500px !important;
+                max-height: 90vh !important;
+            }
+            
+            .admin-select {
+                font-size: 14px !important;
+                padding: 10px !important;
+            }
+            
+            .admin-select option {
+                font-size: 14px !important;
+                padding: 8px !important;
+            }
+            
+            .admin-modal__title {
+                font-size: 20px !important;
+            }
+            
+            .admin-tab {
+                font-size: 12px !important;
+                padding: 8px 15px !important;
+            }
+            
+            /* Подзаголовок - больше и цветной */
+            .trainers-subtitle {
+                font-size: 18px !important;
+                color: #f4d03f !important;
+                font-weight: 600 !important;
+                letter-spacing: 1px !important;
+                line-height: 1.6 !important;
+                text-shadow: 0 2px 4px rgba(0,0,0,0.3) !important;
+            }
+            
+            /* Location на планшете */
+            .location-block__street {
+                font-size: 22px !important;
+            }
+            .location-block__number {
+                font-size: 26px !important;
+            }
+        }
+        
+        @media (max-width: 767px) {
+            .location-block {
+                gap: 6px !important;
+                flex-wrap: wrap !important;
+                justify-content: center !important;
+            }
+            .location-block__ul {
+                font-size: 12px !important;
+            }
+            .location-block__street {
+                font-size: 20px !important;
+                margin-right: 5px !important;
+            }
+            .location-block__number {
+                font-size: 22px !important;
+                margin-right: 10px !important;
+            }
+            .location-block__floor {
+                font-size: 13px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hamburger Menu -->
+    <div class="hamburger-menu">
+        <button class="hamburger" id="hamburger" aria-label="Menu">
+            <span class="hamburger__line"></span>
+            <span class="hamburger__line"></span>
+            <span class="hamburger__line"></span>
+        </button>
+    </div>
+
+    <!-- Side Menu -->
+    <div class="side-menu" id="sideMenu">
+        <div class="side-menu__content">
+            <button class="side-menu__close" id="closeSideMenu">&times;</button>
+            <nav class="side-menu__nav" id="guestMenu">
+                <a href="#" class="side-menu__link" id="loginBtn">Войти</a>
+                <a href="#" class="side-menu__link" id="registerBtn">Зарегистрироваться</a>
+            </nav>
+            <nav class="side-menu__nav side-menu__nav--hidden" id="adminMenu">
+                <h3 class="side-menu__title">Панель управления</h3>
+                <a href="#" class="side-menu__link" id="manageTrainersBtn">Управление тренерами</a>
+                <a href="#" class="side-menu__link" id="manageContentBtn">Управление контентом</a>
+                <a href="#" class="side-menu__link" id="logoutBtn">Выйти</a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <!-- Video Background -->
+        <video class="hero__video-bg" autoplay muted loop playsinline>
+            <source src="ОБЛОЖКА.mp4" type="video/mp4">
+        </video>
+        <div class="hero__overlay"></div>
+        
+        <div class="hero__container">
+            <div class="hero__logo">
+                <img src="images/logo.png.png" alt="ATLETICA" style="height: 80px; width: auto;">
+            </div>
+            
+            <h1 class="hero__title">
+                СТАНЬ <span class="hero__title--highlight">ЛУЧШЕЙ<br>ВЕРСИЕЙ</span> СЕБЯ
+            </h1>
+            
+            <p class="hero__subtitle">
+                Профессиональные тренеры и индивидуальные программы<br>
+                для достижения максимального результата
+            </p>
+            
+            <button class="hero__button" onclick="document.getElementById('gallery').scrollIntoView({behavior: 'smooth'})">
+                Выбрать себе тренера
+                <span class="hero__button-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+            </button>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="trainers-section">
+        <div class="trainers-header">
+            <h2 class="trainers-title">
+                <span class="title-desktop">ТИТУЛОВАННЫЙ ТРЕНЕРСКИЙ СОСТАВ</span>
+                <span class="title-tablet">НАШИ ТРЕНЕРЫ</span>
+            </h2>
+            
+            <p class="trainers-subtitle">
+                Команда профессиональных дипломированных специалистов<br>
+                со стажем более 12 лет
+            </p>
+
+            <!-- Location Info - простой стиль -->
+            <div class="location-block">
+                <span class="location-block__ul">ул.</span>
+                <span class="location-block__street">Бейбулатова</span>
+                <span class="location-block__number">31</span>
+                <span class="location-block__floor">• 2 этаж</span>
+            </div>
+            
+            <div class="trainers-filters">
+                <button class="filter-btn filter-btn--active" data-filter="all">Фитнес</button>
+                <button class="filter-btn" data-filter="Кроссфит">Кроссфит</button>
+                <button class="filter-btn" data-filter="Бодибилдинг">Бодибилдинг</button>
+                <button class="filter-btn" data-filter="Бокс">Тренер по боксу</button>
+                <button class="filter-btn" data-filter="Единоборства">Боевые единоборства</button>
+            </div>
+        </div>
+        
+        <div class="gallery-container" id="gallery">
+            <!-- Cards will be rendered here -->
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p class="footer__text">© 2024 <span class="footer__brand">ATLETICA</span> — Все права защищены</p>
+    </footer>
+
+    <div class="modal" id="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content">
+            <button class="modal__close" aria-label="Close modal">&times;</button>
+            <div class="modal__body">
+                <!-- Modal content will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--small">
+            <button class="modal__close" aria-label="Close modal">&times;</button>
+            <div class="modal__body">
+                <h2 class="auth-modal__title">Вход</h2>
+                <form class="auth-form" id="loginForm">
+                    <div class="auth-form__group">
+                        <label for="loginUsername">Логин</label>
+                        <input type="text" id="loginUsername" required>
+                    </div>
+                    <div class="auth-form__group">
+                        <label for="loginPassword">Пароль</label>
+                        <input type="password" id="loginPassword" autocomplete="current-password" required>
+                    </div>
+                    <button type="submit" class="auth-form__button">Войти</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel Modal -->
+    <div class="modal" id="adminModal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content modal__content--large">
+            <button class="modal__close" aria-label="Close modal">&times;</button>
+            <div class="modal__body">
+                <h2 class="admin-modal__title">Панель управления</h2>
+                <div class="admin-tabs">
+                    <button class="admin-tab admin-tab--active" data-tab="trainers">Тренеры</button>
+                    <button class="admin-tab" data-tab="content">Контент</button>
+                </div>
+                <div class="admin-content" id="adminContent">
+                    <!-- Admin content will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>

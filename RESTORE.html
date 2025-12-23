@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Восстановление карточек</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background: #1a1a1a;
+            color: #fff;
+            text-align: center;
+        }
+        h1 {
+            color: #f4d03f;
+            margin-bottom: 30px;
+        }
+        .btn {
+            background: #f4d03f;
+            color: #1a1a1a;
+            border: none;
+            padding: 20px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 8px;
+            margin: 10px;
+        }
+        .btn:hover {
+            background: #f5d84f;
+        }
+        #status {
+            margin-top: 30px;
+            padding: 20px;
+            background: #2a2a2a;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        .success {
+            color: #4CAF50;
+        }
+        .error {
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <h1>Восстановление карточек тренеров</h1>
+    
+    <button class="btn" onclick="restore()">ВОССТАНОВИТЬ КАРТОЧКИ</button>
+    <button class="btn" onclick="window.location.href='index.html'">Перейти на главную</button>
+    
+    <div id="status"></div>
+
+    <script>
+        function restore() {
+            const status = document.getElementById('status');
+            status.innerHTML = 'Загрузка...';
+            
+            // Очистить localStorage
+            localStorage.removeItem('trainersData');
+            
+            // Загрузить из JSON
+            fetch('data/products.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Не удалось загрузить products.json');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data.products || data.products.length === 0) {
+                        throw new Error('В products.json нет тренеров');
+                    }
+                    
+                    status.innerHTML = `
+                        <p class="success">✓ УСПЕШНО!</p>
+                        <p>Загружено ${data.products.length} тренеров из products.json</p>
+                        <p>localStorage очищен</p>
+                        <p><strong>Теперь откройте index.html и нажмите F5</strong></p>
+                    `;
+                    
+                    console.log('Восстановлено тренеров:', data.products.length);
+                    console.log('Данные:', data.products);
+                })
+                .catch(error => {
+                    status.innerHTML = `
+                        <p class="error">✗ ОШИБКА!</p>
+                        <p>${error.message}</p>
+                        <p>Проверьте что файл data/products.json существует</p>
+                    `;
+                    console.error('Ошибка:', error);
+                });
+        }
+        
+        // Автоматически запустить при загрузке
+        window.onload = () => {
+            restore();
+        };
+    </script>
+</body>
+</html>

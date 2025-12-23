@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест админки</title>
+    <style>
+        body {
+            background: #1a1a1a;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        button {
+            background: #f4d03f;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #ff4444; }
+        .info { color: #2196F3; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Тест админки</h1>
+    
+    <div class="section">
+        <h2>1. Проверка входа</h2>
+        <button onclick="testLogin()">Войти как admin</button>
+        <div id="loginResult"></div>
+    </div>
+    
+    <div class="section">
+        <h2>2. Открыть админку</h2>
+        <p class="info">После входа откройте меню (☰) → "Управление тренерами"</p>
+        <button onclick="window.location.href='index.html'">Перейти на главную</button>
+    </div>
+    
+    <div class="section">
+        <h2>3. Проверка данных</h2>
+        <button onclick="checkData()">Проверить данные</button>
+        <div id="dataResult"></div>
+    </div>
+    
+    <div class="section">
+        <h2>4. Тест URL изображения</h2>
+        <p>Вставьте URL изображения:</p>
+        <input type="text" id="testUrl" style="width: 100%; padding: 10px; background: #1a1a1a; border: 1px solid #444; color: #fff; border-radius: 6px;" 
+               placeholder="https://i.imgur.com/...">
+        <button onclick="testImageUrl()">Проверить URL</button>
+        <div id="urlResult"></div>
+        <img id="testPreview" style="max-width: 300px; margin-top: 15px; border-radius: 8px; display: none;">
+    </div>
+
+    <script>
+        function testLogin() {
+            localStorage.setItem('currentUser', 'admin');
+            document.getElementById('loginResult').innerHTML = '<p class="success">✅ Вход выполнен! Обновите страницу.</p>';
+        }
+
+        function checkData() {
+            const result = document.getElementById('dataResult');
+            const trainersData = localStorage.getItem('trainersData');
+            
+            if (trainersData) {
+                try {
+                    const data = JSON.parse(trainersData);
+                    const count = Array.isArray(data) ? data.length : (data.products ? data.products.length : 0);
+                    result.innerHTML = `<p class="success">✅ Найдено ${count} тренеров</p>`;
+                    
+                    // Show first trainer
+                    const firstTrainer = Array.isArray(data) ? data[0] : data.products[0];
+                    if (firstTrainer) {
+                        result.innerHTML += `
+                            <p><strong>Первый тренер:</strong></p>
+                            <p>Имя: ${firstTrainer.title}</p>
+                            <p>Фото: ${firstTrainer.images ? firstTrainer.images.length : 0}</p>
+                        `;
+                    }
+                } catch (e) {
+                    result.innerHTML = `<p class="error">❌ Ошибка: ${e.message}</p>`;
+                }
+            } else {
+                result.innerHTML = '<p class="error">❌ Данные не найдены. Загрузите страницу сначала.</p>';
+            }
+        }
+
+        function testImageUrl() {
+            const url = document.getElementById('testUrl').value;
+            const result = document.getElementById('urlResult');
+            const preview = document.getElementById('testPreview');
+            
+            if (!url) {
+                result.innerHTML = '<p class="error">❌ Введите URL</p>';
+                return;
+            }
+            
+            result.innerHTML = '<p class="info">⏳ Загрузка...</p>';
+            preview.style.display = 'none';
+            
+            preview.onload = () => {
+                result.innerHTML = '<p class="success">✅ Изображение загружено!</p>';
+                preview.style.display = 'block';
+            };
+            
+            preview.onerror = () => {
+                result.innerHTML = '<p class="error">❌ Не удалось загрузить изображение. Проверьте URL.</p>';
+                preview.style.display = 'none';
+            };
+            
+            preview.src = url;
+        }
+
+        // Auto-check on load
+        window.addEventListener('DOMContentLoaded', () => {
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser) {
+                document.getElementById('loginResult').innerHTML = '<p class="success">✅ Вы уже вошли как ' + currentUser + '</p>';
+            }
+        });
+    </script>
+</body>
+</html>

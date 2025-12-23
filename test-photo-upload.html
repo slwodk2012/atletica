@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест загрузки фото</title>
+    <style>
+        body {
+            background: #1a1a1a;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .photo-input-wrapper {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .photo-input {
+            flex: 1;
+            padding: 10px;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 6px;
+            color: #fff;
+        }
+        .photo-upload-btn {
+            background: #4CAF50;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            font-weight: 600;
+        }
+        .photo-upload-btn:hover {
+            background: #45a049;
+        }
+        .preview {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border: 2px solid #444;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #ff4444; }
+        .info { color: #2196F3; }
+    </style>
+</head>
+<body>
+    <h1>📸 Тест загрузки фотографий</h1>
+    
+    <div class="test-section">
+        <h2>Загрузка с устройства</h2>
+        <p class="info">Выберите изображение (макс. 5 МБ)</p>
+        
+        <div class="photo-input-wrapper">
+            <input type="text" id="photoUrl" class="photo-input" placeholder="Base64 появится здесь..." readonly>
+            <label for="photoFile" class="photo-upload-btn">📁 Выбрать файл</label>
+            <input type="file" id="photoFile" accept="image/*" style="display: none;">
+        </div>
+        
+        <div id="result"></div>
+        <img id="preview" class="preview" style="display: none;">
+    </div>
+    
+    <div class="test-section">
+        <h2>Информация</h2>
+        <div id="info"></div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('photoFile');
+        const urlInput = document.getElementById('photoUrl');
+        const preview = document.getElementById('preview');
+        const result = document.getElementById('result');
+        const info = document.getElementById('info');
+
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            result.innerHTML = '<p class="info">⏳ Загрузка...</p>';
+
+            // Validate
+            if (!file.type.startsWith('image/')) {
+                result.innerHTML = '<p class="error">❌ Это не изображение!</p>';
+                return;
+            }
+
+            const maxSize = 5 * 1024 * 1024;
+            if (file.size > maxSize) {
+                result.innerHTML = '<p class="error">❌ Файл слишком большой (макс. 5 МБ)</p>';
+                return;
+            }
+
+            try {
+                // Convert to base64
+                const base64 = await fileToBase64(file);
+                
+                // Show result
+                urlInput.value = base64.substring(0, 100) + '...';
+                preview.src = base64;
+                preview.style.display = 'block';
+                
+                result.innerHTML = '<p class="success">✅ Фото загружено!</p>';
+                
+                // Show info
+                const sizeKB = (file.size / 1024).toFixed(2);
+                const base64Size = (base64.length / 1024).toFixed(2);
+                info.innerHTML = `
+                    <p><strong>Имя файла:</strong> ${file.name}</p>
+                    <p><strong>Тип:</strong> ${file.type}</p>
+                    <p><strong>Размер оригинала:</strong> ${sizeKB} КБ</p>
+                    <p><strong>Размер base64:</strong> ${base64Size} КБ</p>
+                    <p><strong>Увеличение:</strong> ${((base64Size / sizeKB - 1) * 100).toFixed(1)}%</p>
+                    <p class="info">💡 Base64 увеличивает размер примерно на 33%</p>
+                `;
+
+                // Test localStorage
+                try {
+                    localStorage.setItem('testPhoto', base64);
+                    const saved = localStorage.getItem('testPhoto');
+                    if (saved === base64) {
+                        info.innerHTML += '<p class="success">✅ Сохранение в localStorage работает!</p>';
+                    }
+                    localStorage.removeItem('testPhoto');
+                } catch (e) {
+                    info.innerHTML += '<p class="error">❌ Ошибка localStorage: ' + e.message + '</p>';
+                }
+
+            } catch (error) {
+                result.innerHTML = '<p class="error">❌ Ошибка: ' + error.message + '</p>';
+            }
+        });
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(new Error('Не удалось прочитать файл'));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Show localStorage info
+        const used = new Blob(Object.values(localStorage)).size;
+        const usedMB = (used / 1024 / 1024).toFixed(2);
+        info.innerHTML = `
+            <p><strong>Использовано localStorage:</strong> ${usedMB} МБ</p>
+            <p class="info">💡 Обычно доступно 5-10 МБ</p>
+        `;
+    </script>
+</body>
+</html>

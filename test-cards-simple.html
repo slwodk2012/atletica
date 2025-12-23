@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест карточек</title>
+    <style>
+        body {
+            background: #1a1a1a;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .card {
+            background: #3a3a3a;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .card h3 {
+            color: #f4d03f;
+            margin: 0 0 10px 0;
+        }
+        .card p {
+            color: #999;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center; color: #f4d03f;">Тест загрузки карточек</h1>
+    <div id="status" style="text-align: center; margin: 20px 0;"></div>
+    <div class="gallery" id="gallery"></div>
+
+    <script>
+        const status = document.getElementById('status');
+        const gallery = document.getElementById('gallery');
+
+        fetch('data/products.json')
+            .then(response => response.json())
+            .then(data => {
+                const trainers = data.products;
+                status.innerHTML = `✓ Загружено ${trainers.length} тренеров`;
+                
+                trainers.forEach(trainer => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <h3>${trainer.title}</h3>
+                        <p>${trainer.category}</p>
+                        <p>${trainer.experience}</p>
+                    `;
+                    gallery.appendChild(card);
+                });
+                
+                console.log('Карточек отрендерено:', gallery.children.length);
+            })
+            .catch(error => {
+                status.innerHTML = `✗ Ошибка: ${error.message}`;
+                console.error(error);
+            });
+    </script>
+</body>
+</html>

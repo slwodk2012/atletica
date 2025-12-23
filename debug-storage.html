@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Debug Storage</title>
+    <style>
+        body { background: #1a1a1a; color: #fff; font-family: Arial; padding: 20px; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; background: #f4d03f; border: none; font-size: 16px; }
+        pre { background: #333; padding: 15px; overflow: auto; max-height: 400px; }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+    </style>
+</head>
+<body>
+    <h1>Debug localStorage</h1>
+    
+    <div>
+        <button onclick="checkStorage()">Проверить localStorage</button>
+        <button onclick="clearStorage()">Очистить localStorage</button>
+        <button onclick="initStorage()">Загрузить из JSON в localStorage</button>
+    </div>
+    
+    <h2>Результат:</h2>
+    <pre id="result">Нажмите кнопку...</pre>
+    
+    <script>
+        function checkStorage() {
+            const data = localStorage.getItem('trainersData');
+            const result = document.getElementById('result');
+            
+            if (!data) {
+                result.innerHTML = '<span class="error">localStorage пустой!</span>';
+                return;
+            }
+            
+            try {
+                const parsed = JSON.parse(data);
+                const trainers = Array.isArray(parsed) ? parsed : (parsed.products || []);
+                result.innerHTML = '<span class="success">Найдено тренеров: ' + trainers.length + '</span>\n\n';
+                result.innerHTML += 'Имена:\n' + trainers.map((t, i) => (i+1) + '. ' + t.title + ' (ID: ' + t.id + ')').join('\n');
+            } catch (e) {
+                result.innerHTML = '<span class="error">Ошибка парсинга: ' + e.message + '</span>';
+            }
+        }
+        
+        function clearStorage() {
+            localStorage.removeItem('trainersData');
+            document.getElementById('result').innerHTML = '<span class="success">localStorage очищен!</span>';
+        }
+        
+        async function initStorage() {
+            try {
+                const response = await fetch('data/products.json');
+                const data = await response.json();
+                const trainers = data.products || [];
+                
+                localStorage.setItem('trainersData', JSON.stringify(trainers));
+                
+                document.getElementById('result').innerHTML = '<span class="success">Загружено ' + trainers.length + ' тренеров в localStorage!</span>\n\nТеперь перейдите на index.html';
+            } catch (e) {
+                document.getElementById('result').innerHTML = '<span class="error">Ошибка: ' + e.message + '</span>';
+            }
+        }
+    </script>
+</body>
+</html>
