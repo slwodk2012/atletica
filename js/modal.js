@@ -110,6 +110,13 @@ export class Modal {
   renderContent(product) {
     this.body.innerHTML = '';
 
+    // Back button at the top
+    const backBtn = document.createElement('button');
+    backBtn.className = 'modal__back-btn';
+    backBtn.innerHTML = '← Назад';
+    backBtn.onclick = () => this.close();
+    this.body.appendChild(backBtn);
+
     // Video embed URL for all trainers (VK Video)
     const videoEmbedUrl = 'https://vk.com/video_ext.php?oid=-211271917&id=456239052&hash=820f3a84cfafc8ce';
 

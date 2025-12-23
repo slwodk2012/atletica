@@ -1,6 +1,42 @@
 /**
  * Auth - Manages authentication and admin panel
  */
+
+// Toast notification system
+function showToast(message, type = 'info') {
+  let container = document.querySelector('.toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.className = 'toast-container';
+    document.body.appendChild(container);
+  }
+
+  const icons = {
+    success: '✓',
+    error: '✕',
+    info: 'ℹ'
+  };
+
+  const toast = document.createElement('div');
+  toast.className = `toast toast--${type}`;
+  toast.innerHTML = `
+    <span class="toast__icon">${icons[type] || icons.info}</span>
+    <span class="toast__message">${message}</span>
+    <button class="toast__close" onclick="this.parentElement.remove()">×</button>
+  `;
+
+  container.appendChild(toast);
+
+  // Auto remove after 4 seconds
+  setTimeout(() => {
+    toast.classList.add('toast--hiding');
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+}
+
+// Make it globally available
+window.showToast = showToast;
+
 export class Auth {
   constructor(visualEditor) {
     this.isAuthenticated = false;
@@ -620,7 +656,8 @@ export class Auth {
     document.getElementById('resetContentBtn')?.addEventListener('click', () => {
       if (confirm('Сбросить все настройки к значениям по умолчанию?')) {
         localStorage.removeItem('siteSettings');
-        window.location.reload();
+        showToast('Настройки сброшены!', 'success');
+        setTimeout(() => window.location.reload(), 1000);
       }
     });
   }
@@ -1120,16 +1157,20 @@ export class Auth {
       await firebase.saveTrainer(trainerData);
       console.log('✅ Сохранено в Firebase:', trainerData.id, trainerData.title);
       
-      // Auto-refresh the page to show new trainer
-      window.location.reload();
+      // Show success toast
+      showToast('Тренер сохранен!', 'success');
+      
+      // Close admin panel and refresh cards
+      this.closeAdminPanel();
+      
+      // Reload trainers on the page
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (error) {
       console.error('❌ Ошибка сохранения в Firebase:', error);
-      console.error('Код ошибки:', error.code);
-      console.error('Сообщение:', error.message);
+      showToast('Ошибка сохранения: ' + error.message, 'error');
     }
-    
-    // Refresh the panel
-    this.renderAdminContent('trainers');
   }
 
   saveTrainer(trainerId) {
@@ -1155,7 +1196,9 @@ export class Auth {
     }
 
     localStorage.setItem('trainersData', JSON.stringify(trainers));
-    window.location.reload();
+    showToast('Тренер сохранен!', 'success');
+    this.closeAdminPanel();
+    setTimeout(() => window.location.reload(), 1000);
   }
 
   async deleteTrainer(trainerId) {
@@ -1170,13 +1213,16 @@ export class Auth {
       await firebase.deleteTrainer(trainerId);
       console.log('✅ Удалено из Firebase:', trainerId);
       
-      // Auto-refresh the page
-      window.location.reload();
+      // Show success toast
+      showToast('Тренер удален!', 'success');
+      
+      // Close admin panel and refresh
+      this.closeAdminPanel();
+      setTimeout(() => window.location.reload(), 1000);
     } catch (error) {
       console.error('❌ Ошибка удаления из Firebase:', error);
+      showToast('Ошибка удаления: ' + error.message, 'error');
     }
-    
-    this.renderAdminContent('trainers');
   }
 
   saveContentSettings() {
