@@ -4,13 +4,13 @@
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyH-dDrBQi4F_znZApbQo7aPOCO-kpkDWU",
+  apiKey: "AIzaSyB-0Df8QcLF_zhZ6pbQoz7wPOCO-kpkQWU",
   authDomain: "atletica-34ab2.firebaseapp.com",
   projectId: "atletica-34ab2",
   storageBucket: "atletica-34ab2.firebasestorage.app",
-  messagingSenderId: "942801359590",
-  appId: "1:942801359590:web:5Ad58ab145e59b2c6be977",
-  measurementId: "G-JRDZVNbS4S"
+  messagingSenderId: "842801359590",
+  appId: "1:842801359590:web:56d58eb145e59b2c6be927",
+  measurementId: "G-JFDZVHBS45"
 };
 
 // Import Firebase modules
