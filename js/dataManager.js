@@ -1,18 +1,36 @@
 /**
  * DataManager - Manages product data loading and validation
  */
+import { FirebaseManager } from './firebase.js';
+
 export class DataManager {
   constructor() {
     this.products = [];
+    this.firebase = new FirebaseManager();
+    this.useFirebase = true; // Use Firebase by default
   }
 
   /**
-   * Load products - from localStorage (admin changes) or JSON file (initial)
+   * Load products - from Firebase or JSON file as fallback
    * @returns {Promise<Array>} Array of product objects
    */
   async loadProducts() {
     try {
-      // First try to load from JSON file (always fresh data)
+      // Try Firebase first
+      if (this.useFirebase) {
+        try {
+          const trainers = await this.firebase.loadTrainers();
+          if (trainers && trainers.length > 0) {
+            this.products = trainers;
+            console.log('Loaded from Firebase:', this.products.length, 'trainers');
+            return this.products;
+          }
+        } catch (fbError) {
+          console.warn('Firebase error, falling back to JSON:', fbError);
+        }
+      }
+
+      // Fallback to JSON file
       const response = await fetch('data/products.json');
       
       if (!response.ok) {
@@ -27,12 +45,20 @@ export class DataManager {
       
       this.products = data.products;
       console.log('Loaded from JSON:', this.products.length, 'trainers');
+
+      // Initialize Firebase with JSON data if empty
+      if (this.useFirebase) {
+        try {
+          await this.firebase.initializeFromJSON(this.products);
+          console.log('Firebase initialized with JSON data');
+        } catch (e) {
+          console.warn('Could not initialize Firebase:', e);
+        }
+      }
       
       return this.products;
     } catch (error) {
       console.error('Failed to load products:', error);
-      // Clear any corrupted localStorage
-      localStorage.removeItem('trainersData');
       throw error;
     }
   }
@@ -191,28 +217,42 @@ export class DataManager {
    * @param {Object} trainerData - Trainer data to save
    * @param {boolean} isNew - Whether this is a new trainer
    */
-  saveTrainer(trainerData, isNew) {
-    const data = this.loadData();
-    
-    if (isNew) {
-      data.products.push(trainerData);
-    } else {
-      const index = data.products.findIndex(p => p.id === trainerData.id);
-      if (index !== -1) {
-        data.products[index] = trainerData;
+  async saveTrainer(trainerData, isNew) {
+    // Save to Firebase
+    if (this.useFirebase) {
+      try {
+        await this.firebase.saveTrainer(trainerData);
+      } catch (e) {
+        console.error('Firebase save error:', e);
       }
     }
-    
-    this.saveData(data);
+
+    // Also update local array
+    if (isNew) {
+      this.products.push(trainerData);
+    } else {
+      const index = this.products.findIndex(p => p.id === trainerData.id);
+      if (index !== -1) {
+        this.products[index] = trainerData;
+      }
+    }
   }
 
   /**
    * Delete trainer by ID
    * @param {string} trainerId - ID of trainer to delete
    */
-  deleteTrainer(trainerId) {
-    const data = this.loadData();
-    data.products = data.products.filter(p => p.id !== trainerId);
-    this.saveData(data);
+  async deleteTrainer(trainerId) {
+    // Delete from Firebase
+    if (this.useFirebase) {
+      try {
+        await this.firebase.deleteTrainer(trainerId);
+      } catch (e) {
+        console.error('Firebase delete error:', e);
+      }
+    }
+
+    // Also update local array
+    this.products = this.products.filter(p => p.id !== trainerId);
   }
 }
