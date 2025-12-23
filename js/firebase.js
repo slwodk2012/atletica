@@ -16,10 +16,12 @@ const firebaseConfig = {
 // Import Firebase modules
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
 /**
  * Firebase Database Manager
@@ -27,7 +29,59 @@ const db = getFirestore(app);
 export class FirebaseManager {
   constructor() {
     this.db = db;
+    this.auth = auth;
     this.trainersCollection = 'trainers';
+    this.currentUser = null;
+    
+    // Listen for auth state changes
+    onAuthStateChanged(auth, (user) => {
+      this.currentUser = user;
+      console.log('Auth state:', user ? 'Logged in as ' + user.email : 'Not logged in');
+    });
+  }
+
+  /**
+   * Login with email and password
+   */
+  async login(email, password) {
+    try {
+      const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
+      this.currentUser = userCredential.user;
+      console.log('Firebase Auth: Logged in as', email);
+      return { success: true, user: userCredential.user };
+    } catch (error) {
+      console.error('Firebase Auth error:', error.code, error.message);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Logout
+   */
+  async logout() {
+    try {
+      await signOut(this.auth);
+      this.currentUser = null;
+      console.log('Firebase Auth: Logged out');
+      return { success: true };
+    } catch (error) {
+      console.error('Firebase logout error:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Check if user is authenticated
+   */
+  isAuthenticated() {
+    return this.currentUser !== null;
+  }
+
+  /**
+   * Get current user
+   */
+  getCurrentUser() {
+    return this.currentUser;
   }
 
   /**
@@ -106,4 +160,4 @@ export class FirebaseManager {
   }
 }
 
-export { db, app };
+export { db, app, auth };

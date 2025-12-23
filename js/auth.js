@@ -1,6 +1,7 @@
 /**
  * Auth - Manages authentication and admin panel
  */
+import { FirebaseManager } from './firebase.js';
 
 // Toast notification system
 function showToast(message, type = 'info') {
@@ -42,10 +43,7 @@ export class Auth {
     this.isAuthenticated = false;
     this.currentUser = null;
     this.visualEditor = visualEditor;
-    // Простая авторизация (в реальном проекте использовать backend)
-    this.users = {
-      'atletika1203': 'Atletika293At@A'
-    };
+    this.firebaseManager = new FirebaseManager();
     // Cache for trainers
     this.cachedTrainers = null;
     // Undo history
@@ -55,14 +53,15 @@ export class Auth {
     this.init();
   }
 
-  init() {
-    // Check if user is already logged in
-    const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) {
-      this.isAuthenticated = true;
-      this.currentUser = savedUser;
-      this.showAdminMenu();
-    }
+  async init() {
+    // Check Firebase auth state
+    setTimeout(async () => {
+      if (this.firebaseManager.isAuthenticated()) {
+        this.isAuthenticated = true;
+        this.currentUser = this.firebaseManager.getCurrentUser();
+        this.showAdminMenu();
+      }
+    }, 1000);
     
     // Clear old undo history to prevent quota issues
     try {
@@ -179,36 +178,59 @@ export class Auth {
     document.body.style.overflow = '';
   }
 
-  handleLogin() {
-    const username = document.getElementById('loginUsername').value;
+  async handleLogin() {
+    const email = document.getElementById('loginUsername').value;
     const password = document.getElementById('loginPassword').value;
+    
+    // Show loading
+    const submitBtn = document.querySelector('#loginForm button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Вход...';
+    submitBtn.disabled = true;
 
-    if (this.users[username] && this.users[username] === password) {
-      this.isAuthenticated = true;
-      this.currentUser = username;
-      localStorage.setItem('currentUser', username);
+    try {
+      // Login via Firebase Auth
+      const result = await this.firebaseManager.login(email, password);
       
-      this.showAdminMenu();
-      this.closeLoginModal();
+      if (result.success) {
+        this.isAuthenticated = true;
+        this.currentUser = result.user;
+        
+        this.showAdminMenu();
+        this.closeLoginModal();
+        showToast('Вход выполнен успешно!', 'success');
+        
+        // Close side menu
+        document.getElementById('hamburger').classList.remove('active');
+        document.getElementById('sideMenu').classList.remove('active');
+      } else {
+        showToast('Неверный email или пароль', 'error');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      showToast('Ошибка входа: ' + error.message, 'error');
+    } finally {
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+    }
+  }
+
+  async handleLogout() {
+    try {
+      await this.firebaseManager.logout();
+      this.isAuthenticated = false;
+      this.currentUser = null;
+      
+      this.showGuestMenu();
+      showToast('Вы вышли из системы', 'info');
       
       // Close side menu
       document.getElementById('hamburger').classList.remove('active');
       document.getElementById('sideMenu').classList.remove('active');
-    } else {
-      alert('Неверный логин или пароль');
+    } catch (error) {
+      console.error('Logout error:', error);
+      showToast('Ошибка выхода', 'error');
     }
-  }
-
-  handleLogout() {
-    this.isAuthenticated = false;
-    this.currentUser = null;
-    localStorage.removeItem('currentUser');
-    
-    this.showGuestMenu();
-    
-    // Close side menu
-    document.getElementById('hamburger').classList.remove('active');
-    document.getElementById('sideMenu').classList.remove('active');
   }
 
   showAdminMenu() {
