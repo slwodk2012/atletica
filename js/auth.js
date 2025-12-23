@@ -143,8 +143,6 @@ export class Auth {
       // Close side menu
       document.getElementById('hamburger').classList.remove('active');
       document.getElementById('sideMenu').classList.remove('active');
-      
-      alert('Вы успешно вошли в систему!');
     } else {
       alert('Неверный логин или пароль');
     }
@@ -160,8 +158,6 @@ export class Auth {
     // Close side menu
     document.getElementById('hamburger').classList.remove('active');
     document.getElementById('sideMenu').classList.remove('active');
-    
-    alert('Вы вышли из системы');
   }
 
   showAdminMenu() {
@@ -569,8 +565,6 @@ export class Auth {
       a.download = 'products.json';
       a.click();
       URL.revokeObjectURL(url);
-      
-      alert('Файл products.json скачан! Замените им файл data/products.json чтобы сохранить изменения навсегда.');
     });
   }
 
@@ -626,8 +620,7 @@ export class Auth {
     document.getElementById('resetContentBtn')?.addEventListener('click', () => {
       if (confirm('Сбросить все настройки к значениям по умолчанию?')) {
         localStorage.removeItem('siteSettings');
-        alert('Настройки сброшены! Обновите страницу.');
-        this.renderAdminContent('content');
+        window.location.reload();
       }
     });
   }
@@ -1125,11 +1118,14 @@ export class Auth {
     try {
       // Save to Firebase
       await firebase.saveTrainer(trainerData);
-      console.log('Сохранено в Firebase:', trainerData.id);
-      alert('Тренер сохранен! Изменения применены для всех пользователей.');
+      console.log('✅ Сохранено в Firebase:', trainerData.id, trainerData.title);
+      
+      // Auto-refresh the page to show new trainer
+      window.location.reload();
     } catch (error) {
-      console.error('Ошибка сохранения в Firebase:', error);
-      alert('Ошибка сохранения: ' + error.message);
+      console.error('❌ Ошибка сохранения в Firebase:', error);
+      console.error('Код ошибки:', error.code);
+      console.error('Сообщение:', error.message);
     }
     
     // Refresh the panel
@@ -1159,8 +1155,7 @@ export class Auth {
     }
 
     localStorage.setItem('trainersData', JSON.stringify(trainers));
-    alert('Тренер сохранен! Обновите страницу для применения изменений.');
-    this.renderAdminContent('trainers');
+    window.location.reload();
   }
 
   async deleteTrainer(trainerId) {
@@ -1173,12 +1168,12 @@ export class Auth {
       
       // Delete from Firebase
       await firebase.deleteTrainer(trainerId);
-      console.log('Удалено из Firebase:', trainerId);
+      console.log('✅ Удалено из Firebase:', trainerId);
       
-      alert('Тренер удален! Изменения применены для всех пользователей.');
+      // Auto-refresh the page
+      window.location.reload();
     } catch (error) {
-      console.error('Ошибка удаления из Firebase:', error);
-      alert('Ошибка удаления: ' + error.message);
+      console.error('❌ Ошибка удаления из Firebase:', error);
     }
     
     this.renderAdminContent('trainers');
@@ -1239,8 +1234,6 @@ export class Auth {
     
     // Apply settings immediately
     this.applyContentSettings(settings);
-    
-    alert('Настройки сохранены и применены!');
   }
 
   applyContentSettings(settings) {

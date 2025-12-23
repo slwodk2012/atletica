@@ -20,7 +20,12 @@
         <button onclick="testLoad()">1. Загрузить тренеров</button>
         <button onclick="testSave()">2. Сохранить тест-тренера</button>
         <button onclick="testDelete()">3. Удалить тест-тренера</button>
+        <button onclick="deleteById()">4. Удалить по ID</button>
         <button onclick="clearLog()">Очистить лог</button>
+    </div>
+    
+    <div style="margin-top: 10px;">
+        <input type="text" id="deleteId" placeholder="ID для удаления (например: prod-015)" style="padding: 8px; width: 300px;">
     </div>
     
     <div id="log"></div>
@@ -65,7 +70,6 @@
                 });
             } catch (error) {
                 log(`❌ Ошибка: ${error.message}`, 'error');
-                log(`Код ошибки: ${error.code}`, 'error');
             }
         };
 
@@ -86,12 +90,6 @@
                 log(`✅ Тренер сохранен: ${testTrainer.id}`, 'success');
             } catch (error) {
                 log(`❌ Ошибка сохранения: ${error.message}`, 'error');
-                log(`Код ошибки: ${error.code}`, 'error');
-                if (error.code === 'permission-denied') {
-                    log('⚠️ Нужно настроить правила безопасности в Firebase Console!', 'error');
-                    log('Перейдите в Firebase Console -> Firestore Database -> Rules', 'info');
-                    log('И установите: allow read, write: if true;', 'info');
-                }
             }
         };
 
@@ -105,7 +103,21 @@
             }
         };
 
-        // Auto-test on load
+        window.deleteById = async () => {
+            const id = document.getElementById('deleteId').value.trim();
+            if (!id) {
+                log('❌ Введите ID для удаления', 'error');
+                return;
+            }
+            log(`Удаление тренера ${id}...`, 'info');
+            try {
+                await deleteDoc(doc(db, 'trainers', id));
+                log(`✅ Тренер ${id} удален`, 'success');
+            } catch (error) {
+                log(`❌ Ошибка удаления: ${error.message}`, 'error');
+            }
+        };
+
         log('Firebase инициализирован', 'success');
         log(`Project ID: ${firebaseConfig.projectId}`, 'info');
     </script>
