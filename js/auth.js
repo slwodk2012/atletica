@@ -974,6 +974,24 @@ export class Auth {
         </div>
 
         <div class="admin-form-section">
+          <h4 class="admin-form-section__title">Дополнительные плашки</h4>
+          <p style="color: #999; font-size: 11px; margin-bottom: 10px;">
+            Добавьте дополнительные плашки на карточку (например: "Старший тренер", "Чемпион")
+          </p>
+          <div id="badgesContainer">
+            ${(trainer?.badges || []).map((badge, index) => `
+              <div class="admin-badge-item" data-index="${index}">
+                <input type="text" class="badge-text-input" value="${typeof badge === 'string' ? badge : badge.text || ''}" placeholder="Текст плашки">
+                <input type="color" class="badge-color-input" value="${badge.color || '#f4d03f'}" title="Цвет фона">
+                <input type="color" class="badge-text-color-input" value="${badge.textColor || '#1a1a1a'}" title="Цвет текста">
+                <button type="button" class="admin-btn admin-btn--delete admin-btn--small remove-badge-btn">✕</button>
+              </div>
+            `).join('')}
+          </div>
+          <button type="button" class="admin-btn admin-btn--add admin-btn--small" id="addBadgeBtn">+ Добавить плашку</button>
+        </div>
+
+        <div class="admin-form-section">
           <h4 class="admin-form-section__title">Образование</h4>
           <div class="admin-form__group">
             <textarea id="trainerEducation" rows="4">${education}</textarea>
@@ -1219,6 +1237,32 @@ export class Auth {
         specItem.remove();
       });
     });
+    
+    // Add badge button
+    document.getElementById('addBadgeBtn')?.addEventListener('click', () => {
+      const container = document.getElementById('badgesContainer');
+      const badgeItem = document.createElement('div');
+      badgeItem.className = 'admin-badge-item';
+      badgeItem.innerHTML = `
+        <input type="text" class="badge-text-input" placeholder="Текст плашки">
+        <input type="color" class="badge-color-input" value="#f4d03f" title="Цвет фона">
+        <input type="color" class="badge-text-color-input" value="#1a1a1a" title="Цвет текста">
+        <button type="button" class="admin-btn admin-btn--delete admin-btn--small remove-badge-btn">✕</button>
+      `;
+      container.appendChild(badgeItem);
+      
+      // Add remove handler
+      badgeItem.querySelector('.remove-badge-btn').addEventListener('click', () => {
+        badgeItem.remove();
+      });
+    });
+    
+    // Remove badge buttons (for existing)
+    document.querySelectorAll('.remove-badge-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.target.closest('.admin-badge-item').remove();
+      });
+    });
   }
 
   async saveDetailedTrainer(trainerId) {
@@ -1264,6 +1308,16 @@ export class Auth {
       .map(input => input.value.trim())
       .filter(spec => spec !== '');
 
+    // Collect badges
+    const badgeItems = document.querySelectorAll('.admin-badge-item');
+    const badges = Array.from(badgeItems)
+      .map(item => ({
+        text: item.querySelector('.badge-text-input')?.value.trim() || '',
+        color: item.querySelector('.badge-color-input')?.value || '#f4d03f',
+        textColor: item.querySelector('.badge-text-color-input')?.value || '#1a1a1a'
+      }))
+      .filter(badge => badge.text !== '');
+
     // Get main photo
     const mainPhotoInput = document.getElementById('mainPhotoUrl');
     const mainPhoto = mainPhotoInput?.value.trim() || 
@@ -1291,6 +1345,7 @@ export class Auth {
       images: images.length > 0 ? images : [mainPhoto],
       videos: videos.length > 0 ? videos : [],
       specialization: specialization.length > 0 ? specialization : [],
+      badges: badges.length > 0 ? badges : [],
       education: document.getElementById('trainerEducation')?.value || '',
       phone: document.getElementById('trainerPhone')?.value || '',
       price: 2500,

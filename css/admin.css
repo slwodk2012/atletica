@@ -2076,3 +2076,36 @@
 .admin-filter-item.drag-over {
   border-top: 3px solid #f4d03f;
 }
+
+
+/* Badge Editor Styles */
+.admin-badge-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: #1a1a1a;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.admin-badge-item .badge-text-input {
+  flex: 1;
+  padding: 6px 10px;
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 12px;
+}
+
+.admin-badge-item .badge-color-input,
+.admin-badge-item .badge-text-color-input {
+  width: 32px;
+  height: 28px;
+  padding: 2px;
+  border: 1px solid #3a3a3a;
+  border-radius: 4px;
+  cursor: pointer;
+  background: #2a2a2a;
+}
