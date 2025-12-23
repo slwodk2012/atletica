@@ -135,7 +135,7 @@ export class Auth {
 
     // Login modal close
     const loginModal = document.getElementById('loginModal');
-    loginModal?.querySelector('.modal__close')?.addEventListener('click', () => {
+    document.getElementById('closeLoginModal')?.addEventListener('click', () => {
       this.closeLoginModal();
     });
     loginModal?.querySelector('.modal__overlay')?.addEventListener('click', () => {
@@ -144,7 +144,7 @@ export class Auth {
 
     // Admin modal close
     const adminModal = document.getElementById('adminModal');
-    adminModal?.querySelector('.modal__close')?.addEventListener('click', () => {
+    document.getElementById('closeAdminModal')?.addEventListener('click', () => {
       this.closeAdminPanel();
     });
     adminModal?.querySelector('.modal__overlay')?.addEventListener('click', () => {

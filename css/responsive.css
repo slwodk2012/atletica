@@ -9,8 +9,9 @@
 /* Mobile First - Small Mobile (<480px) */
 @media (max-width: 479px) {
   .gallery-container {
-    grid-template-columns: 1fr;
-    padding: var(--spacing-sm);
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 10px;
   }
 }
 
@@ -18,7 +19,8 @@
 @media (min-width: 480px) and (max-width: 767px) {
   .gallery-container {
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--spacing-sm);
+    gap: 12px;
+    padding: 12px;
   }
 }
 
@@ -297,13 +299,31 @@
 /* Cards - Mobile */
 @media (max-width: 767px) {
   .gallery-container {
-    grid-template-columns: 1fr;
-    gap: 20px;
-    padding: 20px 15px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 10px;
   }
   
   .card {
     max-width: 100%;
+  }
+  
+  .card__title {
+    font-size: 14px;
+  }
+  
+  .card__description {
+    font-size: 11px;
+  }
+  
+  .card__button {
+    font-size: 11px;
+    padding: 8px;
+  }
+  
+  .card__badge {
+    font-size: 8px;
+    padding: 3px 6px;
   }
   
   .card__image {
