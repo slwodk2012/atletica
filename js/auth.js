@@ -724,18 +724,11 @@ export class Auth {
           
           <div class="admin-form__row">
             <div class="admin-form__group">
-              <label>Категория *</label>
-              <select id="trainerCategory" required>
-                <option value="Фитнес" ${trainer?.category === 'Фитнес' ? 'selected' : ''}>Фитнес</option>
-                <option value="Кроссфит" ${trainer?.category === 'Кроссфит' ? 'selected' : ''}>Кроссфит</option>
-                <option value="Бодибилдинг" ${trainer?.category === 'Бодибилдинг' ? 'selected' : ''}>Бодибилдинг</option>
-                <option value="Бокс" ${trainer?.category === 'Бокс' ? 'selected' : ''}>Бокс</option>
-                <option value="Единоборства" ${trainer?.category === 'Единоборства' ? 'selected' : ''}>Единоборства</option>
-                <option value="Пауэрлифтинг" ${trainer?.category === 'Пауэрлифтинг' ? 'selected' : ''}>Пауэрлифтинг</option>
-                <option value="Йога" ${trainer?.category === 'Йога' ? 'selected' : ''}>Йога</option>
-                <option value="Плавание" ${trainer?.category === 'Плавание' ? 'selected' : ''}>Плавание</option>
-                <option value="Стретчинг" ${trainer?.category === 'Стретчинг' ? 'selected' : ''}>Стретчинг</option>
-              </select>
+              <label>Категории * (через запятую)</label>
+              <input type="text" id="trainerCategory" value="${trainer?.category || 'Фитнес'}" placeholder="Фитнес, Кроссфит, Бокс" required>
+              <p style="color: #999; font-size: 11px; margin-top: 5px;">
+                Доступные: Фитнес, Кроссфит, Бодибилдинг, Бокс, Кикбоксинг, Единоборства, Пауэрлифтинг, Йога, Плавание, Стретчинг
+              </p>
             </div>
             
             <div class="admin-form__group">

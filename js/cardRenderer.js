@@ -41,11 +41,14 @@ export class CardRenderer {
     const badges = document.createElement('div');
     badges.className = 'card__badges';
     
-    // Category badge (yellow)
-    const categoryBadge = document.createElement('span');
-    categoryBadge.className = 'card__badge';
-    categoryBadge.textContent = product.category || 'Товар';
-    badges.appendChild(categoryBadge);
+    // Category badge (yellow) - can be multiple categories separated by comma
+    const categories = (product.category || 'Товар').split(',').map(c => c.trim());
+    categories.forEach(cat => {
+      const categoryBadge = document.createElement('span');
+      categoryBadge.className = 'card__badge';
+      categoryBadge.textContent = cat;
+      badges.appendChild(categoryBadge);
+    });
     
     // Experience badge (dark)
     if (product.experience) {
@@ -53,6 +56,23 @@ export class CardRenderer {
       expBadge.className = 'card__badge card__badge--dark';
       expBadge.textContent = product.experience;
       badges.appendChild(expBadge);
+    }
+    
+    // Custom badges from array
+    if (product.badges && Array.isArray(product.badges)) {
+      product.badges.forEach(badge => {
+        const customBadge = document.createElement('span');
+        customBadge.className = 'card__badge';
+        if (badge.dark) {
+          customBadge.classList.add('card__badge--dark');
+        }
+        if (badge.color) {
+          customBadge.style.backgroundColor = badge.color;
+          customBadge.style.color = badge.textColor || '#1a1a1a';
+        }
+        customBadge.textContent = badge.text || badge;
+        badges.appendChild(customBadge);
+      });
     }
     
     imageWrapper.appendChild(badges);
