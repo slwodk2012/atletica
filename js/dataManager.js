@@ -46,12 +46,10 @@ export class DataManager {
     try {
       const trainers = await this.firebase.loadTrainers();
       if (trainers && trainers.length > 0) {
-        // Only update if Firebase has different data
-        if (trainers.length !== this.products.length) {
-          this.products = trainers;
-          console.log('Updated from Firebase:', this.products.length, 'trainers');
-          if (onUpdate) onUpdate(this.products);
-        }
+        // Always use Firebase data as source of truth
+        this.products = trainers;
+        console.log('Updated from Firebase:', this.products.length, 'trainers');
+        if (onUpdate) onUpdate(this.products);
       } else if (this.products.length > 0) {
         // Firebase empty, initialize in background
         this.firebase.initializeFromJSON(this.products).catch(e => 
