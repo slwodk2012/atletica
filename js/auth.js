@@ -227,16 +227,15 @@ export class Auth {
   }
 
   async renderTrainersPanel() {
-    // Load trainers from localStorage first, then from JSON
+    // Load trainers from Firebase
     let trainers = [];
     try {
-      const savedData = localStorage.getItem('trainersData');
-      if (savedData) {
-        const parsed = JSON.parse(savedData);
-        trainers = Array.isArray(parsed) ? parsed : (parsed.products || []);
-      }
+      const { FirebaseManager } = await import('./firebase.js');
+      const firebase = new FirebaseManager();
+      trainers = await firebase.loadTrainers();
+      console.log('Загружено из Firebase для панели:', trainers.length);
       
-      // If localStorage empty, load from JSON
+      // If Firebase is empty, load from JSON
       if (trainers.length === 0) {
         const response = await fetch('data/products.json');
         const data = await response.json();
@@ -546,10 +545,12 @@ export class Auth {
     // Export data button
     document.getElementById('exportDataBtn')?.addEventListener('click', async () => {
       let trainers = [];
-      const savedData = localStorage.getItem('trainersData');
-      if (savedData) {
-        const parsed = JSON.parse(savedData);
-        trainers = Array.isArray(parsed) ? parsed : (parsed.products || []);
+      try {
+        const { FirebaseManager } = await import('./firebase.js');
+        const firebase = new FirebaseManager();
+        trainers = await firebase.loadTrainers();
+      } catch (e) {
+        console.warn('Firebase error:', e);
       }
       
       if (trainers.length === 0) {
@@ -634,14 +635,12 @@ export class Auth {
   async showDetailedTrainerForm(trainerId = null) {
     const container = document.getElementById('trainerFormContainer');
     
-    // Load trainers from localStorage first, then from JSON
+    // Load trainers from Firebase
     let trainers = [];
     try {
-      const savedData = localStorage.getItem('trainersData');
-      if (savedData) {
-        const parsed = JSON.parse(savedData);
-        trainers = Array.isArray(parsed) ? parsed : (parsed.products || []);
-      }
+      const { FirebaseManager } = await import('./firebase.js');
+      const firebase = new FirebaseManager();
+      trainers = await firebase.loadTrainers();
       
       if (trainers.length === 0) {
         const response = await fetch('data/products.json');
@@ -1050,26 +1049,22 @@ export class Auth {
   async saveDetailedTrainer(trainerId) {
     console.log('Начало сохранения тренера:', trainerId);
     
-    // Load trainers - first from localStorage, then from JSON
-    let trainers = [];
-    const savedData = localStorage.getItem('trainersData');
-    if (savedData) {
-      try {
-        trainers = JSON.parse(savedData);
-        if (!Array.isArray(trainers)) trainers = [];
-      } catch (e) {
-        trainers = [];
-      }
-    }
+    // Import Firebase manager
+    const { FirebaseManager } = await import('./firebase.js');
+    const firebase = new FirebaseManager();
     
-    // If localStorage is empty, load from JSON file
-    if (trainers.length === 0) {
+    // Load trainers from Firebase first
+    let trainers = [];
+    try {
+      trainers = await firebase.loadTrainers();
+      console.log('Загружено из Firebase:', trainers.length);
+    } catch (e) {
+      console.warn('Firebase load error, trying JSON:', e);
       try {
         const response = await fetch('data/products.json');
         const data = await response.json();
         trainers = data.products || [];
-      } catch (e) {
-        console.error('Failed to load from JSON:', e);
+      } catch (e2) {
         trainers = [];
       }
     }
@@ -1127,26 +1122,13 @@ export class Auth {
       currency: 'RUB'
     };
 
-    if (trainerId) {
-      const index = trainers.findIndex(t => t.id === trainerId);
-      if (index !== -1) {
-        trainers[index] = trainerData;
-        console.log('Обновлен тренер на позиции:', index);
-      } else {
-        trainers.push(trainerData);
-        console.log('Тренер не найден, добавлен как новый');
-      }
-    } else {
-      trainers.push(trainerData);
-      console.log('Добавлен новый тренер');
-    }
-
     try {
-      localStorage.setItem('trainersData', JSON.stringify(trainers));
-      console.log('Сохранено в localStorage, всего тренеров:', trainers.length);
-      alert('Тренер сохранен! Обновите страницу (F5) для применения изменений.');
+      // Save to Firebase
+      await firebase.saveTrainer(trainerData);
+      console.log('Сохранено в Firebase:', trainerData.id);
+      alert('Тренер сохранен! Изменения применены для всех пользователей.');
     } catch (error) {
-      console.error('Ошибка сохранения:', error);
+      console.error('Ошибка сохранения в Firebase:', error);
       alert('Ошибка сохранения: ' + error.message);
     }
     
@@ -1184,34 +1166,21 @@ export class Auth {
   async deleteTrainer(trainerId) {
     if (!confirm('Удалить этого тренера?')) return;
 
-    // Load trainers - first from localStorage, then from JSON
-    let trainers = [];
-    const savedData = localStorage.getItem('trainersData');
-    if (savedData) {
-      try {
-        trainers = JSON.parse(savedData);
-        if (!Array.isArray(trainers)) trainers = [];
-      } catch (e) {
-        trainers = [];
-      }
+    try {
+      // Import Firebase manager
+      const { FirebaseManager } = await import('./firebase.js');
+      const firebase = new FirebaseManager();
+      
+      // Delete from Firebase
+      await firebase.deleteTrainer(trainerId);
+      console.log('Удалено из Firebase:', trainerId);
+      
+      alert('Тренер удален! Изменения применены для всех пользователей.');
+    } catch (error) {
+      console.error('Ошибка удаления из Firebase:', error);
+      alert('Ошибка удаления: ' + error.message);
     }
     
-    // If localStorage is empty, load from JSON file
-    if (trainers.length === 0) {
-      try {
-        const response = await fetch('data/products.json');
-        const data = await response.json();
-        trainers = data.products || [];
-      } catch (e) {
-        console.error('Failed to load from JSON:', e);
-        trainers = [];
-      }
-    }
-
-    trainers = trainers.filter(t => t.id !== trainerId);
-    localStorage.setItem('trainersData', JSON.stringify(trainers));
-    
-    alert('Тренер удален! Обновите страницу для применения изменений.');
     this.renderAdminContent('trainers');
   }
 
