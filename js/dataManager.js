@@ -46,20 +46,10 @@ export class DataManager {
     try {
       const trainers = await this.firebase.loadTrainers();
       if (trainers && trainers.length > 0) {
-        // Only update if data is actually different
-        const currentIds = this.products.map(p => p.id).sort().join(',');
-        const newIds = trainers.map(p => p.id).sort().join(',');
-        
-        if (currentIds !== newIds) {
-          // Different trainers - update
-          this.products = trainers;
-          console.log('Updated from Firebase:', this.products.length, 'trainers');
-          if (onUpdate) onUpdate(this.products);
-        } else {
-          // Same trainers - just update data silently (no re-render)
-          this.products = trainers;
-          console.log('Firebase synced (no UI update needed)');
-        }
+        // JSON has priority - only use Firebase for admin changes
+        // Don't overwrite local data with Firebase data
+        console.log('Loaded from Firebase:', trainers.length, 'trainers');
+        console.log('Firebase synced (no UI update needed)');
       } else if (this.products.length > 0) {
         // Firebase empty, initialize in background
         console.log('Initializing Firebase with JSON data...');

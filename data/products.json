@@ -239,10 +239,8 @@
       "category": "Бокс",
       "experience": "Стаж 8 лет",
       "image": "images/trainers/гусен_main.jpg",
-      "imageAlt": "Тренер Гусен Омаров",
-      "images": [
-        "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=600&fit=crop"
-      ],
+      "imageAlt": "Тренер Гусен",
+      "images": [],
       "specialization": [
         "постановка правильного нокаутирующего удара",
         "развитие скорости, выносливости и силовых показателей",
