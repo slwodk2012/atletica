@@ -9,7 +9,7 @@
       "experience": "Стаж 12 лет",
       "image": "images/trainers/газимагомед.jpeg",
       "imageAlt": "Тренер Газимагомед",
-      "images": [],
+      "images": ["images/trainers/газимагомед.jpeg", "images/trainers/газимагомед_2.png"],
       "specialization": [
         "бодибилдинг и набор мышечной массы",
         "сушка и рельеф",
@@ -54,7 +54,7 @@
       "experience": "Стаж 12 лет",
       "image": "images/trainers/МУРАД1.jpeg",
       "imageAlt": "Тренер Мурад",
-      "images": [],
+      "images": ["images/trainers/МУРАД1.jpeg", "images/trainers/мурад_2.png", "images/trainers/мурад_3.png", "images/trainers/мурад_4.png", "images/trainers/мурад_5.png"],
       "specialization": [
         "силовой тренинг",
         "набор мышечной массы",
@@ -76,7 +76,7 @@
       "experience": "Стаж 8 лет",
       "image": "images/trainers/джамал.jpeg",
       "imageAlt": "Тренер Джамал",
-      "images": [],
+      "images": ["images/trainers/джамал.jpeg", "images/trainers/джамал_2.png"],
       "specialization": [
         "функциональный тренинг",
         "увеличение силовых показателей",
@@ -121,7 +121,7 @@
       "experience": "Стаж 8 лет",
       "image": "images/trainers/али.jpeg",
       "imageAlt": "Тренер Али",
-      "images": [],
+      "images": ["images/trainers/али.jpeg", "images/trainers/али_2.png"],
       "specialization": [
         "бокс",
         "кикбоксинг",
@@ -164,7 +164,7 @@
       "experience": "Стаж 12 лет",
       "image": "images/trainers/ШАМИЛЬ3.jpeg",
       "imageAlt": "Тренер Шамиль",
-      "images": [],
+      "images": ["images/trainers/ШАМИЛЬ3.jpeg", "images/trainers/шамиль3_2.png", "images/trainers/шамиль3_3.png"],
       "specialization": [
         "функциональный и силовой тренинг",
         "набор мышечной массы",
@@ -186,7 +186,7 @@
       "experience": "Стаж 8 лет",
       "image": "images/trainers/шуай.jpeg",
       "imageAlt": "Тренер Шуай",
-      "images": [],
+      "images": ["images/trainers/шуай.jpeg", "images/trainers/шуай_2.png", "images/trainers/шуай_3.png"],
       "specialization": [
         "функциональный и силовой тренинг",
         "набор мышечной массы",
