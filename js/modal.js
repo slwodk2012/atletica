@@ -175,24 +175,38 @@ export class Modal {
       images = [product.image];
     }
 
+    // Total slides = images + 1 video
+    const totalSlides = images.length + 1;
+    const videoIndex = images.length; // Video is the last slide
+
     // Current slide index
     let currentSlide = 0;
 
-    // Function to show slide
+    // Function to show slide (including video)
     const showSlide = (index) => {
-      if (index < 0) index = images.length - 1;
-      if (index >= images.length) index = 0;
+      if (index < 0) index = totalSlides - 1;
+      if (index >= totalSlides) index = 0;
       currentSlide = index;
       
-      mainImage.style.display = 'block';
-      videoContainer.style.display = 'none';
       const modalVideo = document.getElementById('modalLocalVideo');
-      if (modalVideo) {
-        modalVideo.pause();
-        modalVideo.currentTime = 0;
-      }
       
-      mainImage.src = images[currentSlide];
+      if (currentSlide === videoIndex) {
+        // Show video
+        mainImage.style.display = 'none';
+        videoContainer.style.display = 'block';
+        if (modalVideo) {
+          modalVideo.play();
+        }
+      } else {
+        // Show image
+        mainImage.style.display = 'block';
+        videoContainer.style.display = 'none';
+        if (modalVideo) {
+          modalVideo.pause();
+          modalVideo.currentTime = 0;
+        }
+        mainImage.src = images[currentSlide];
+      }
       
       // Update thumbnails
       document.querySelectorAll('.modal__thumbnail').forEach((t, i) => {
@@ -209,8 +223,8 @@ export class Modal {
       };
     }
 
-    // Navigation arrows
-    if (images.length > 1) {
+    // Navigation arrows (always show if more than 1 slide including video)
+    if (totalSlides > 1) {
       const prevBtn = document.createElement('button');
       prevBtn.className = 'modal__nav-btn modal__nav-btn--prev';
       prevBtn.innerHTML = '‹';
@@ -266,16 +280,7 @@ export class Modal {
         thumb.style.display = 'none';
       };
       thumb.onclick = () => {
-        mainImage.style.display = 'block';
-        videoContainer.style.display = 'none';
-        const modalVideo = document.getElementById('modalLocalVideo');
-        if (modalVideo) {
-          modalVideo.pause();
-          modalVideo.currentTime = 0;
-        }
-        mainImage.src = imgSrc;
-        document.querySelectorAll('.modal__thumbnail').forEach(t => t.classList.remove('modal__thumbnail--active'));
-        thumb.classList.add('modal__thumbnail--active');
+        showSlide(index);
       };
       thumbnails.appendChild(thumb);
     });
@@ -289,14 +294,7 @@ export class Modal {
       </svg>
     `;
     videoThumb.onclick = () => {
-      mainImage.style.display = 'none';
-      videoContainer.style.display = 'block';
-      const modalVideo = document.getElementById('modalLocalVideo');
-      if (modalVideo) {
-        modalVideo.play();
-      }
-      document.querySelectorAll('.modal__thumbnail').forEach(t => t.classList.remove('modal__thumbnail--active'));
-      videoThumb.classList.add('modal__thumbnail--active');
+      showSlide(videoIndex);
     };
     thumbnails.appendChild(videoThumb);
     
