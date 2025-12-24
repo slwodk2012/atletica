@@ -44,32 +44,16 @@ export class DataManager {
 
   /**
    * Sync with Firebase in background
+   * Firebase используется только для админки, не для отображения
    */
   async syncWithFirebase(onUpdate) {
     try {
       const trainers = await this.firebase.loadTrainers();
       
       if (trainers && trainers.length > 0) {
-        // Check if Firebase data has valid images
-        const hasValidImages = trainers.every(t => 
-          t.image && !t.image.startsWith('data:') && t.image.includes('images/trainers/')
-        );
-        
-        if (hasValidImages) {
-          // Firebase has valid data - use it
-          this.products = trainers;
-          console.log('Using Firebase data:', trainers.length, 'trainers');
-          
-          if (onUpdate && typeof onUpdate === 'function') {
-            onUpdate(trainers);
-          }
-        } else {
-          // Firebase has old/invalid data - update it with JSON data
-          console.log('Firebase has outdated data, updating with JSON...');
-          await this.firebase.initializeFromJSON(this.products);
-          console.log('Firebase updated with JSON data');
-          // Keep using JSON data
-        }
+        console.log('Firebase has', trainers.length, 'trainers (not used for display)');
+        // НЕ обновляем UI данными из Firebase - используем только JSON
+        // Firebase используется только для сохранения изменений из админки
       } else if (this.products.length > 0) {
         // Firebase empty, initialize with JSON
         console.log('Initializing Firebase with JSON data...');

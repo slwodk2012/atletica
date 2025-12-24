@@ -1915,17 +1915,10 @@ export class Auth {
    */
   async refreshGalleryInstantly() {
     try {
-      // Load fresh data from Firebase
-      const { FirebaseManager } = await import('./firebase.js');
-      const firebase = new FirebaseManager();
-      let trainers = await firebase.loadTrainers();
-      
-      // If Firebase empty, load from JSON
-      if (trainers.length === 0) {
-        const response = await fetch('data/products.json?v=' + Date.now(), { cache: 'no-store' });
-        const data = await response.json();
-        trainers = data.products || [];
-      }
+      // Load fresh data from JSON (not Firebase - Firebase has old data)
+      const response = await fetch('data/products.json?v=' + Date.now(), { cache: 'no-store' });
+      const data = await response.json();
+      let trainers = data.products || [];
       
       // Get gallery container
       const gallery = document.getElementById('gallery');
