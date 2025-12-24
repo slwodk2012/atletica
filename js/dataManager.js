@@ -49,10 +49,14 @@ export class DataManager {
     try {
       const trainers = await this.firebase.loadTrainers();
       if (trainers && trainers.length > 0) {
-        // JSON has priority - only use Firebase for admin changes
-        // Don't overwrite local data with Firebase data
+        // Firebase has priority - use Firebase data for display
+        this.products = trainers;
         console.log('Loaded from Firebase:', trainers.length, 'trainers');
-        console.log('Firebase synced (no UI update needed)');
+        
+        // Update UI with Firebase data
+        if (onUpdate && typeof onUpdate === 'function') {
+          onUpdate(trainers);
+        }
       } else if (this.products.length > 0) {
         // Firebase empty, initialize in background
         console.log('Initializing Firebase with JSON data...');
