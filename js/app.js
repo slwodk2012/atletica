@@ -22,8 +22,11 @@ class App {
    */
   async init() {
     try {
-      // Clear old cached data to ensure fresh load
+      // Clear ALL cached data to ensure fresh load
       localStorage.removeItem('trainersData');
+      localStorage.removeItem('visualEditorStyles');
+      sessionStorage.clear();
+      console.log('Cache cleared, loading fresh data...');
       
       // Get DOM elements
       this.galleryContainer = document.getElementById('gallery');

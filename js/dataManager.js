@@ -17,8 +17,11 @@ export class DataManager {
    */
   async loadProducts(onUpdate) {
     try {
-      // Load JSON first (instant)
-      const response = await fetch('data/products.json');
+      // Load JSON first (instant) - add cache busting
+      const cacheBuster = '?v=' + Date.now();
+      const response = await fetch('data/products.json' + cacheBuster, {
+        cache: 'no-store'
+      });
       if (response.ok) {
         const data = await response.json();
         if (data.products && Array.isArray(data.products)) {
