@@ -65,11 +65,17 @@ export class Modal {
       return;
     }
 
+    // Save scroll position before opening modal
+    this.savedScrollPosition = window.scrollY;
+
     this.currentProduct = product;
     this.renderContent(product);
     this.modal.classList.add('modal--open');
     document.body.classList.add('modal-open');
     document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${this.savedScrollPosition}px`;
+    document.body.style.width = '100%';
     
     // Focus close button for accessibility
     this.closeButton.focus();
@@ -86,14 +92,24 @@ export class Modal {
     }
     
     // Stop video when closing modal
-    const videoFrame = document.getElementById('modalVideoFrame');
-    if (videoFrame) {
-      videoFrame.src = '';
+    const modalVideo = document.getElementById('modalLocalVideo');
+    if (modalVideo) {
+      modalVideo.pause();
+      modalVideo.currentTime = 0;
     }
     
     this.modal.classList.remove('modal--open');
     document.body.classList.remove('modal-open');
     document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.width = '';
+    
+    // Restore scroll position
+    if (this.savedScrollPosition !== undefined) {
+      window.scrollTo(0, this.savedScrollPosition);
+    }
+    
     this.currentProduct = null;
   }
 
@@ -119,9 +135,6 @@ export class Modal {
     backBtn.onclick = () => this.close();
     this.body.appendChild(backBtn);
 
-    // Video embed URL for all trainers (VK Video)
-    const videoEmbedUrl = 'https://vk.com/video_ext.php?oid=-211271917&id=456239052&hash=820f3a84cfafc8ce';
-
     // Image Gallery with slideshow
     const gallery = document.createElement('div');
     gallery.className = 'modal__gallery';
@@ -134,21 +147,20 @@ export class Modal {
     mainImage.className = 'modal__image modal__image--main';
     mainImage.id = 'modalMainImage';
     
-    // Video container (hidden by default)
+    // Video container (hidden by default) - local video
     const videoContainer = document.createElement('div');
     videoContainer.className = 'modal__video-container';
     videoContainer.id = 'modalVideoContainer';
     videoContainer.style.display = 'none';
     videoContainer.innerHTML = `
-      <iframe 
-        src="" 
-        id="modalVideoFrame"
+      <video 
+        id="modalLocalVideo"
         width="100%" 
         height="500" 
-        frameborder="0" 
-        allowfullscreen="1"
-        allow="autoplay; encrypted-media; fullscreen; picture-in-picture">
-      </iframe>
+        controls
+        playsinline>
+        <source src="azizov hulk.MOV" type="video/mp4">
+      </video>
     `;
     
     mainDisplay.appendChild(mainImage);
@@ -174,8 +186,11 @@ export class Modal {
       
       mainImage.style.display = 'block';
       videoContainer.style.display = 'none';
-      const videoFrame = document.getElementById('modalVideoFrame');
-      if (videoFrame) videoFrame.src = '';
+      const modalVideo = document.getElementById('modalLocalVideo');
+      if (modalVideo) {
+        modalVideo.pause();
+        modalVideo.currentTime = 0;
+      }
       
       mainImage.src = images[currentSlide];
       
@@ -253,7 +268,11 @@ export class Modal {
       thumb.onclick = () => {
         mainImage.style.display = 'block';
         videoContainer.style.display = 'none';
-        document.getElementById('modalVideoFrame').src = '';
+        const modalVideo = document.getElementById('modalLocalVideo');
+        if (modalVideo) {
+          modalVideo.pause();
+          modalVideo.currentTime = 0;
+        }
         mainImage.src = imgSrc;
         document.querySelectorAll('.modal__thumbnail').forEach(t => t.classList.remove('modal__thumbnail--active'));
         thumb.classList.add('modal__thumbnail--active');
@@ -272,7 +291,10 @@ export class Modal {
     videoThumb.onclick = () => {
       mainImage.style.display = 'none';
       videoContainer.style.display = 'block';
-      document.getElementById('modalVideoFrame').src = videoEmbedUrl;
+      const modalVideo = document.getElementById('modalLocalVideo');
+      if (modalVideo) {
+        modalVideo.play();
+      }
       document.querySelectorAll('.modal__thumbnail').forEach(t => t.classList.remove('modal__thumbnail--active'));
       videoThumb.classList.add('modal__thumbnail--active');
     };

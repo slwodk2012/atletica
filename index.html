@@ -405,25 +405,7 @@
         </div>
     </section>
 
-    <!-- Quote Section with Video -->
-    <section class="quote-section">
-        <div class="quote-container">
-            <div class="quote-video">
-                <video id="quoteVideo" autoplay muted loop playsinline>
-                    <source src="azizov hulk.MOV" type="video/mp4">
-                </video>
-                <button class="video-sound-btn" id="videoSoundBtn">🔇</button>
-            </div>
-            <div class="quote-content">
-                <div class="quote-icon">"</div>
-                <blockquote class="quote-text">
-                    Твоё тело может всё. Это разум нужно убедить.
-                </blockquote>
-                <cite class="quote-author">— Арнольд Шварценеггер</cite>
-                <p class="quote-subtitle">Начни свой путь к совершенству сегодня</p>
-            </div>
-        </div>
-    </section>
+
 
     <!-- Gallery Section -->
     <section class="trainers-section">
@@ -516,24 +498,5 @@
     </div>
 
     <script type="module" src="js/app.js"></script>
-    <script>
-        // Video sound toggle
-        document.addEventListener('DOMContentLoaded', function() {
-            const video = document.getElementById('quoteVideo');
-            const soundBtn = document.getElementById('videoSoundBtn');
-            
-            if (video && soundBtn) {
-                soundBtn.addEventListener('click', function() {
-                    if (video.muted) {
-                        video.muted = false;
-                        soundBtn.textContent = '🔊';
-                    } else {
-                        video.muted = true;
-                        soundBtn.textContent = '🔇';
-                    }
-                });
-            }
-        });
-    </script>
 </body>
 </html>
