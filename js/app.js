@@ -22,6 +22,9 @@ class App {
    */
   async init() {
     try {
+      // Clear old cached data to ensure fresh load
+      localStorage.removeItem('trainersData');
+      
       // Get DOM elements
       this.galleryContainer = document.getElementById('gallery');
       const modalElement = document.getElementById('modal');

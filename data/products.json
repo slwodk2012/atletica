@@ -7,12 +7,9 @@
       "detailedDescription": "Чемпион по бодибилдингу. Эксперт в наборе мышечной массы и сушке.",
       "category": "Бодибилдинг",
       "experience": "Стаж 12 лет",
-      "image": "images/trainers/газимагомед_main.jpg",
+      "image": "images/trainers/газимагомед.jpeg",
       "imageAlt": "Тренер Газимагомед",
-      "images": [
-        "images/газимагомед.jpg.png",
-        "images/trainers/газимагомед_2.png"
-      ],
+      "images": [],
       "specialization": [
         "бодибилдинг и набор мышечной массы",
         "сушка и рельеф",
@@ -32,12 +29,9 @@
       "detailedDescription": "Опытный тренер с фокусом на здоровый образ жизни и правильное питание.",
       "category": "Кроссфит",
       "experience": "Стаж 12 лет",
-      "image": "images/trainers/шамиль_main.jpg",
+      "image": "images/trainers/ШАМИЛЬ.jpeg",
       "imageAlt": "Тренер Шамиль",
-      "images": [
-        "images/trainers/шамиль_1.jpg",
-        "images/trainers/шамиль_2.png"
-      ],
+      "images": [],
       "specialization": [
         "функциональный и силовой тренинг",
         "увеличение выносливости",
@@ -58,15 +52,9 @@
       "detailedDescription": "Профессиональный тренер по фитнесу с 12-летним опытом.",
       "category": "Кроссфит",
       "experience": "Стаж 12 лет",
-      "image": "images/trainers/мурад_main.jpg",
+      "image": "images/trainers/МУРАД1.jpeg",
       "imageAlt": "Тренер Мурад",
-      "images": [
-        "images/trainers/мурад_1.jpg",
-        "images/trainers/мурад_2.png",
-        "images/trainers/мурад_3.png",
-        "images/trainers/мурад_4.png",
-        "images/trainers/мурад_5.png"
-      ],
+      "images": [],
       "specialization": [
         "силовой тренинг",
         "набор мышечной массы",
@@ -86,12 +74,9 @@
       "detailedDescription": "Прошел обучение в колледже фитнеса и бодибилдинга им. Бена Вейдера, г. Санкт-Петербург, 2016 г.",
       "category": "Фитнес",
       "experience": "Стаж 8 лет",
-      "image": "images/trainers/джамал_main.jpg",
+      "image": "images/trainers/джамал.jpeg",
       "imageAlt": "Тренер Джамал",
-      "images": [
-        "images/trainers/джамал_1.jpg",
-        "images/trainers/джамал_2.png"
-      ],
+      "images": [],
       "specialization": [
         "функциональный тренинг",
         "увеличение силовых показателей",
@@ -106,42 +91,15 @@
       "currency": "RUB"
     },
     {
-      "id": "prod-007",
-      "title": "Ибрагим",
-      "description": "Персональный тренер по боксу",
-      "detailedDescription": "Мастер спорта по боксу. Чемпион кубка России. Чемпион кубка Европы.",
-      "category": "Бокс",
-      "experience": "Стаж 12 лет",
-      "image": "images/trainers/ибрагим_main.jpg",
-      "imageAlt": "Тренер Ибрагим",
-      "images": [
-        "images/trainers/ибрагим_1.jpg"
-      ],
-      "specialization": [
-        "постановка нокаутирующего удара",
-        "развитие скорости и функциональности",
-        "индивидуальный подбор упражнений исходя из уровня подготовки",
-        "самооборона",
-        "работа с детьми и взрослыми"
-      ],
-      "education": "Мастер спорта по боксу. Чемпион кубка России. Чемпион кубка Европы.",
-      "phone": "+7 (999) 123-45-67",
-      "price": 2500,
-      "currency": "RUB"
-    },
-    {
       "id": "prod-008",
       "title": "Али",
       "description": "Персональный тренер по кикбоксингу",
       "detailedDescription": "Мастер спорта по кикбоксингу и тайскому боксу.",
       "category": "Единоборства",
       "experience": "Стаж 8 лет",
-      "image": "images/trainers/али_main.jpg",
+      "image": "images/trainers/али.jpeg",
       "imageAlt": "Тренер Али",
-      "images": [
-        "images/trainers/али_1.jpg",
-        "images/trainers/али_2.png"
-      ],
+      "images": [],
       "specialization": [
         "бокс",
         "кикбоксинг",
@@ -155,16 +113,14 @@
     },
     {
       "id": "prod-009",
-      "title": "Шамиль 3",
+      "title": "Шамиль",
       "description": "Персональный тренер по пауэрлифтингу",
       "detailedDescription": "Мастер спорта международного класса по пауэрлифтингу.",
       "category": "Пауэрлифтинг",
       "experience": "Стаж 15 лет",
-      "image": "images/trainers/шамиль_3_main.jpg",
-      "imageAlt": "Тренер Шамиль 3",
-      "images": [
-        "images/trainers/шамиль_3_1.jpg"
-      ],
+      "image": "images/trainers/ШАМИЛЬ3.jpeg",
+      "imageAlt": "Тренер Шамиль",
+      "images": [],
       "specialization": [
         "пауэрлифтинг (присед, жим, тяга)",
         "силовые тренировки",
@@ -184,13 +140,9 @@
       "detailedDescription": "Мастер спорта по плаванию. Работа с детьми и взрослыми.",
       "category": "Фитнес",
       "experience": "Стаж 12 лет",
-      "image": "images/trainers/шамиль_main.jpg",
-      "imageAlt": "Тренер Магомедов Шамиль ",
-      "images": [
-        "images/trainers/шамиль_1.jpg",
-        "images/trainers/шамиль_2.png",
-        "images/trainers/шамиль_3.png"
-      ],
+      "image": "images/trainers/ШАМИЛЬ2.jpeg",
+      "imageAlt": "Тренер Шамиль",
+      "images": [],
       "specialization": [
         "функциональный и силовой тренинг",
         "набор мышечной массы",
@@ -204,38 +156,10 @@
       "currency": "RUB"
     },
     {
-      "id": "prod-012",
-      "title": "Шуай",
-      "description": "Персональный тренер по фитнесу",
-      "detailedDescription": "Окончил курс бодибилдинга, фитнеса, оздоровительной физической культуры в колледже фитнеса и бодибилдинга им. Бена Вейдера. Санкт-Петербург 2016.",
-      "category": "Фитнес",
-      "experience": "Стаж 8 лет",
-      "image": "images/trainers/шуай_main.jpg",
-      "imageAlt": "Тренер Шуай",
-      "images": [
-        "images/trainers/шуай_1.jpg",
-        "images/trainers/шуай_2.png",
-        "images/trainers/шуай_3.png"
-      ],
-      "specialization": [
-        "функциональный и силовой тренинг",
-        "набор мышечной массы",
-        "увеличение выносливости",
-        "увеличение силовых показателей",
-        "снижение веса",
-        "консультации по питанию",
-        "составление персонального тренировочного плана"
-      ],
-      "education": "Колледж фитнеса и бодибилдинга им. Бена Вейдера. Санкт-Петербург 2016.",
-      "phone": "+7 964 001-00-77",
-      "price": 2500,
-      "currency": "RUB"
-    },
-    {
       "id": "prod-014",
       "title": "Гусен",
       "description": "Тренер по боксу",
-      "detailedDescription": "Профессиональный боксер. \nRecord 3-0 2ko.",
+      "detailedDescription": "Профессиональный боксер. Record 3-0 2ko.",
       "category": "Бокс",
       "experience": "Стаж 8 лет",
       "image": "images/trainers/гусен_main.jpg",
@@ -251,6 +175,54 @@
       ],
       "education": "",
       "phone": "+7 999 242-38-38",
+      "price": 2500,
+      "currency": "RUB"
+    },
+    {
+      "id": "prod-015",
+      "title": "Мухаммад",
+      "description": "Персональный тренер по фитнесу",
+      "detailedDescription": "Профессиональный тренер.",
+      "category": "Фитнес",
+      "experience": "Стаж 5 лет",
+      "image": "images/trainers/МУХАММАД1.jpeg",
+      "imageAlt": "Тренер Мухаммад",
+      "images": [],
+      "specialization": [],
+      "education": "",
+      "phone": "+7 (999) 123-45-67",
+      "price": 2500,
+      "currency": "RUB"
+    },
+    {
+      "id": "prod-016",
+      "title": "Рамазан",
+      "description": "Персональный тренер по фитнесу",
+      "detailedDescription": "Профессиональный тренер.",
+      "category": "Фитнес",
+      "experience": "Стаж 5 лет",
+      "image": "images/trainers/РАМАЗАН.jpeg",
+      "imageAlt": "Тренер Рамазан",
+      "images": [],
+      "specialization": [],
+      "education": "",
+      "phone": "+7 (999) 123-45-67",
+      "price": 2500,
+      "currency": "RUB"
+    },
+    {
+      "id": "prod-017",
+      "title": "Руслан",
+      "description": "Персональный тренер по фитнесу",
+      "detailedDescription": "Профессиональный тренер.",
+      "category": "Фитнес",
+      "experience": "Стаж 5 лет",
+      "image": "images/trainers/РУСЛАН.jpeg",
+      "imageAlt": "Тренер Руслан",
+      "images": [],
+      "specialization": [],
+      "education": "",
+      "phone": "+7 (999) 123-45-67",
       "price": 2500,
       "currency": "RUB"
     }
