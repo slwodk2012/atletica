@@ -1411,13 +1411,11 @@ export class Auth {
       // Show success toast
       showToast('Тренер сохранен!', 'success');
       
-      // Close admin panel and refresh cards
+      // Close admin panel
       this.closeAdminPanel();
       
-      // Reload trainers on the page
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+      // Instantly refresh gallery without page reload
+      await this.refreshGalleryInstantly();
     } catch (error) {
       console.error('❌ Ошибка сохранения в Firebase:', error);
       showToast('Ошибка сохранения: ' + error.message, 'error');
@@ -1501,7 +1499,8 @@ export class Auth {
         showToast(`Восстановлен: ${lastAction.oldData.title}`, 'success');
       }
       
-      setTimeout(() => window.location.reload(), 1000);
+      // Instantly refresh gallery without page reload
+      await this.refreshGalleryInstantly();
     } catch (error) {
       console.error('Undo error:', error);
       showToast('Ошибка отмены: ' + error.message, 'error');
@@ -1563,9 +1562,11 @@ export class Auth {
       // Show success toast
       showToast('Тренер удален!', 'success');
       
-      // Close admin panel and refresh
+      // Close admin panel
       this.closeAdminPanel();
-      setTimeout(() => window.location.reload(), 1000);
+      
+      // Instantly refresh gallery without page reload
+      await this.refreshGalleryInstantly();
     } catch (error) {
       console.error('❌ Ошибка удаления из Firebase:', error);
       showToast('Ошибка удаления: ' + error.message, 'error');
@@ -1907,6 +1908,64 @@ export class Auth {
     if (Object.keys(settings).length > 0) {
       this.applyContentSettings(settings);
     }
+  }
+
+  /**
+   * Instantly refresh gallery without page reload
+   */
+  async refreshGalleryInstantly() {
+    try {
+      // Load fresh data from Firebase
+      const { FirebaseManager } = await import('./firebase.js');
+      const firebase = new FirebaseManager();
+      let trainers = await firebase.loadTrainers();
+      
+      // If Firebase empty, load from JSON
+      if (trainers.length === 0) {
+        const response = await fetch('data/products.json?v=' + Date.now(), { cache: 'no-store' });
+        const data = await response.json();
+        trainers = data.products || [];
+      }
+      
+      // Get gallery container
+      const gallery = document.getElementById('gallery');
+      if (!gallery) {
+        console.warn('Gallery container not found');
+        return;
+      }
+      
+      // Import CardRenderer
+      const { CardRenderer } = await import('./cardRenderer.js');
+      const cardRenderer = new CardRenderer();
+      
+      // Re-render gallery
+      cardRenderer.renderGallery(trainers, gallery, 50);
+      
+      // Re-setup event listeners for cards
+      this.setupCardClickListeners(gallery);
+      
+      console.log('✅ Gallery refreshed with', trainers.length, 'trainers');
+    } catch (error) {
+      console.error('Error refreshing gallery:', error);
+      // Fallback to page reload
+      window.location.reload();
+    }
+  }
+
+  /**
+   * Setup click listeners for cards after refresh
+   */
+  setupCardClickListeners(gallery) {
+    gallery.querySelectorAll('.card').forEach(card => {
+      card.addEventListener('click', () => {
+        const productId = card.getAttribute('data-product-id');
+        if (productId) {
+          // Trigger modal open
+          const event = new CustomEvent('openTrainerModal', { detail: { productId } });
+          window.dispatchEvent(event);
+        }
+      });
+    });
   }
 
   /**

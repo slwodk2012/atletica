@@ -184,15 +184,36 @@ class App {
 }
 
 // Initialize app when DOM is ready
+let appInstance = null;
+
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
-    const app = new App();
-    app.init();
+    appInstance = new App();
+    appInstance.init();
   });
 } else {
-  const app = new App();
-  app.init();
+  appInstance = new App();
+  appInstance.init();
 }
+
+// Listen for modal open events from admin panel refresh
+window.addEventListener('openTrainerModal', async (e) => {
+  const { productId } = e.detail;
+  if (appInstance && appInstance.modal) {
+    // Load fresh data from Firebase
+    try {
+      const { FirebaseManager } = await import('./firebase.js');
+      const firebase = new FirebaseManager();
+      const trainers = await firebase.loadTrainers();
+      const product = trainers.find(t => t.id === productId);
+      if (product) {
+        appInstance.modal.open(product);
+      }
+    } catch (error) {
+      console.error('Error opening modal:', error);
+    }
+  }
+});
 
 // Функция для открытия тренера по ID из URL
 function openTrainerFromURL() {
