@@ -203,6 +203,8 @@ body.modal-open {
   overflow: hidden;
   position: fixed;
   width: 100%;
+  left: 0;
+  right: 0;
 }
 
 .modal__overlay {

@@ -296,20 +296,13 @@ export class Auth {
   }
 
   async renderTrainersPanel() {
-    // Load trainers from Firebase
+    // Load trainers from JSON (not Firebase - Firebase has corrupted data)
     let trainers = [];
     try {
-      const { FirebaseManager } = await import('./firebase.js');
-      const firebase = new FirebaseManager();
-      trainers = await firebase.loadTrainers();
-      console.log('Загружено из Firebase для панели:', trainers.length);
-      
-      // If Firebase is empty, load from JSON
-      if (trainers.length === 0) {
-        const response = await fetch('data/products.json');
-        const data = await response.json();
-        trainers = data.products || [];
-      }
+      const response = await fetch('data/products.json?v=' + Date.now(), { cache: 'no-store' });
+      const data = await response.json();
+      trainers = data.products || [];
+      console.log('Загружено из JSON для панели:', trainers.length);
       
       // Сортировка по алфавиту
       trainers.sort((a, b) => a.title.localeCompare(b.title, 'ru'));
@@ -849,18 +842,12 @@ export class Auth {
   async showDetailedTrainerForm(trainerId = null) {
     const container = document.getElementById('trainerFormContainer');
     
-    // Load trainers from Firebase
+    // Load trainers from JSON (not Firebase)
     let trainers = [];
     try {
-      const { FirebaseManager } = await import('./firebase.js');
-      const firebase = new FirebaseManager();
-      trainers = await firebase.loadTrainers();
-      
-      if (trainers.length === 0) {
-        const response = await fetch('data/products.json');
-        const data = await response.json();
-        trainers = data.products || [];
-      }
+      const response = await fetch('data/products.json?v=' + Date.now(), { cache: 'no-store' });
+      const data = await response.json();
+      trainers = data.products || [];
     } catch (error) {
       console.error('Failed to load trainers:', error);
       trainers = [];
