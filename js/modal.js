@@ -66,7 +66,7 @@ export class Modal {
     }
 
     // Save scroll position before opening modal
-    this.savedScrollPosition = window.scrollY;
+    this.savedScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
 
     this.currentProduct = product;
     this.renderContent(product);
@@ -75,6 +75,8 @@ export class Modal {
     document.body.style.overflow = 'hidden';
     document.body.style.position = 'fixed';
     document.body.style.top = `-${this.savedScrollPosition}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
     document.body.style.width = '100%';
     
     // Focus close button for accessibility
@@ -103,11 +105,17 @@ export class Modal {
     document.body.style.overflow = '';
     document.body.style.position = '';
     document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
     document.body.style.width = '';
     
     // Restore scroll position
     if (this.savedScrollPosition !== undefined) {
-      window.scrollTo(0, this.savedScrollPosition);
+      window.scrollTo({
+        top: this.savedScrollPosition,
+        left: 0,
+        behavior: 'instant'
+      });
     }
     
     this.currentProduct = null;

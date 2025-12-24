@@ -48,21 +48,32 @@ export class DataManager {
   async syncWithFirebase(onUpdate) {
     try {
       const trainers = await this.firebase.loadTrainers();
+      
       if (trainers && trainers.length > 0) {
-        // Firebase has priority - use Firebase data for display
-        this.products = trainers;
-        console.log('Loaded from Firebase:', trainers.length, 'trainers');
+        // Check if Firebase data has valid images
+        const hasValidImages = trainers.every(t => 
+          t.image && !t.image.startsWith('data:') && t.image.includes('images/trainers/')
+        );
         
-        // Update UI with Firebase data
-        if (onUpdate && typeof onUpdate === 'function') {
-          onUpdate(trainers);
+        if (hasValidImages) {
+          // Firebase has valid data - use it
+          this.products = trainers;
+          console.log('Using Firebase data:', trainers.length, 'trainers');
+          
+          if (onUpdate && typeof onUpdate === 'function') {
+            onUpdate(trainers);
+          }
+        } else {
+          // Firebase has old/invalid data - update it with JSON data
+          console.log('Firebase has outdated data, updating with JSON...');
+          await this.firebase.initializeFromJSON(this.products);
+          console.log('Firebase updated with JSON data');
+          // Keep using JSON data
         }
       } else if (this.products.length > 0) {
-        // Firebase empty, initialize in background
+        // Firebase empty, initialize with JSON
         console.log('Initializing Firebase with JSON data...');
-        this.firebase.initializeFromJSON(this.products).catch(e => 
-          console.warn('Firebase init error:', e)
-        );
+        await this.firebase.initializeFromJSON(this.products);
       }
     } catch (fbError) {
       console.warn('Firebase sync error:', fbError.message);
