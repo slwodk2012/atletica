@@ -168,8 +168,8 @@ export class Modal {
         playsinline
         preload="metadata"
         style="max-height: 500px; background: #000;">
+        <source src="azizov_hulk.mp4" type="video/mp4">
         <source src="azizov hulk.MOV" type="video/quicktime">
-        <source src="azizov hulk.MOV" type="video/mp4">
         Ваш браузер не поддерживает видео
       </video>
     `;
