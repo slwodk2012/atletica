@@ -547,6 +547,38 @@ export class Auth {
             </div>
           </div>
 
+          <!-- Global Trainer Video Section -->
+          <div class="admin-content-section">
+            <h3 class="admin-content-section__title">🎬 Глобальное видео тренеров</h3>
+            <p style="color: #999; font-size: 13px; margin-bottom: 15px;">
+              Это видео показывается у ВСЕХ тренеров в модальном окне (кроме тех, у кого есть личное видео)
+            </p>
+            <div class="admin-form">
+              <div class="admin-form__group">
+                <label>
+                  <input type="checkbox" id="globalVideoEnabled" ${settings.globalVideoEnabled !== false ? 'checked' : ''}>
+                  Включить глобальное видео для всех тренеров
+                </label>
+              </div>
+              <div class="admin-form__group">
+                <label>URL глобального видео</label>
+                <div class="photo-input-wrapper">
+                  <input type="text" id="globalVideoUrl" value="${settings.globalVideo || 'azizov hulk.MOV'}" placeholder="URL видео или загрузите файл">
+                  <label class="photo-upload-btn" for="globalVideoFile">
+                    Загрузить видео
+                  </label>
+                  <input type="file" id="globalVideoFile" accept="video/mp4,video/quicktime,video/webm" style="display: none;">
+                </div>
+              </div>
+              <div id="globalVideoPreview" style="margin-top: 10px;">
+                <video src="${settings.globalVideo || 'azizov hulk.MOV'}" style="max-width: 300px; border-radius: 8px;" controls muted></video>
+              </div>
+              <button type="button" class="admin-btn admin-btn--add admin-btn--small" id="applyGlobalVideoBtn" style="margin-top: 10px;">
+                Применить глобальное видео
+              </button>
+            </div>
+          </div>
+
           <!-- Icons Section -->
           <div class="admin-content-section">
             <h3 class="admin-content-section__title">🎯 Иконки</h3>
@@ -845,6 +877,71 @@ export class Auth {
         console.error('Error:', error);
         showToast('Ошибка сохранения', 'error');
       }
+    });
+    
+    // Global trainer video upload handler
+    document.getElementById('globalVideoFile')?.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      if (file.size > 100 * 1024 * 1024) {
+        showToast('Файл слишком большой (макс. 100MB)', 'error');
+        return;
+      }
+      
+      showToast('Загрузка видео...', 'info');
+      
+      try {
+        const formData = new FormData();
+        formData.append('video', file);
+        formData.append('type', 'hero');
+        
+        const response = await fetch('/api/upload-video', {
+          method: 'POST',
+          body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          document.getElementById('globalVideoUrl').value = result.url;
+          const preview = document.querySelector('#globalVideoPreview video');
+          if (preview) {
+            preview.src = result.url + '?v=' + Date.now();
+          }
+          showToast('Видео загружено!', 'success');
+        } else {
+          showToast('Ошибка: ' + result.error, 'error');
+        }
+      } catch (error) {
+        console.error('Upload error:', error);
+        showToast('Ошибка загрузки видео', 'error');
+      }
+    });
+    
+    // Apply global trainer video button
+    document.getElementById('applyGlobalVideoBtn')?.addEventListener('click', async () => {
+      const videoUrl = document.getElementById('globalVideoUrl').value.trim();
+      const enabled = document.getElementById('globalVideoEnabled').checked;
+      
+      // Save to localStorage settings
+      const settings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
+      settings.globalVideo = videoUrl;
+      settings.globalVideoEnabled = enabled;
+      localStorage.setItem('siteSettings', JSON.stringify(settings));
+      
+      // Also save to server
+      try {
+        await fetch('/api/hero-video', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ globalVideo: videoUrl, globalVideoEnabled: enabled })
+        });
+      } catch (e) {
+        console.log('Server save optional');
+      }
+      
+      showToast('Глобальное видео ' + (enabled ? 'включено' : 'отключено') + '!', 'success');
     });
     
     // Filter editor handlers

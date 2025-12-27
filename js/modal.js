@@ -155,24 +155,37 @@ export class Modal {
     mainImage.className = 'modal__image modal__image--main';
     mainImage.id = 'modalMainImage';
     
+    // Get global video settings
+    const settings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
+    const globalVideoEnabled = settings.globalVideoEnabled !== false;
+    const globalVideoUrl = settings.globalVideo || 'azizov hulk.MOV';
+    
+    // Check if trainer has personal video
+    const hasPersonalVideo = product.videos && product.videos.length > 0 && product.videos[0];
+    const videoToUse = hasPersonalVideo ? product.videos[0] : globalVideoUrl;
+    const showVideo = globalVideoEnabled || hasPersonalVideo;
+    
     // Video container - local video for all trainers
     const videoContainer = document.createElement('div');
     videoContainer.className = 'modal__video-container';
     videoContainer.id = 'modalVideoContainer';
     videoContainer.style.display = 'none';
-    videoContainer.innerHTML = `
-      <video 
-        id="modalLocalVideo"
-        width="100%" 
-        controls
-        playsinline
-        preload="metadata"
-        style="max-height: 500px; background: #000;">
-        <source src="azizov_hulk.mp4" type="video/mp4">
-        <source src="azizov hulk.MOV" type="video/quicktime">
-        Ваш браузер не поддерживает видео
-      </video>
-    `;
+    
+    if (showVideo) {
+      videoContainer.innerHTML = `
+        <video 
+          id="modalLocalVideo"
+          width="100%" 
+          controls
+          playsinline
+          preload="metadata"
+          style="max-height: 500px; background: #000;">
+          <source src="${videoToUse}" type="video/mp4">
+          <source src="${videoToUse}" type="video/quicktime">
+          Ваш браузер не поддерживает видео
+        </video>
+      `;
+    }
     
     mainDisplay.appendChild(mainImage);
     mainDisplay.appendChild(videoContainer);
@@ -186,8 +199,8 @@ export class Modal {
       images = [product.image];
     }
 
-    // Total slides = images + 1 video
-    const totalSlides = images.length + 1;
+    // Total slides = images + 1 video (if enabled)
+    const totalSlides = showVideo ? images.length + 1 : images.length;
     const videoIndex = images.length; // Video is the last slide
 
     // Current slide index
@@ -201,7 +214,7 @@ export class Modal {
       
       const modalVideo = document.getElementById('modalLocalVideo');
       
-      if (currentSlide === videoIndex) {
+      if (showVideo && currentSlide === videoIndex) {
         // Show video
         mainImage.style.display = 'none';
         videoContainer.style.display = 'block';
@@ -296,18 +309,20 @@ export class Modal {
       thumbnails.appendChild(thumb);
     });
     
-    // Video thumbnail at the end
-    const videoThumb = document.createElement('div');
-    videoThumb.className = 'modal__thumbnail modal__thumbnail--video';
-    videoThumb.innerHTML = `
-      <svg viewBox="0 0 24 24" width="30" height="30" fill="#f4d03f">
-        <path d="M8 5v14l11-7z"/>
-      </svg>
-    `;
-    videoThumb.onclick = () => {
-      showSlide(videoIndex);
-    };
-    thumbnails.appendChild(videoThumb);
+    // Video thumbnail at the end (only if video is enabled)
+    if (showVideo) {
+      const videoThumb = document.createElement('div');
+      videoThumb.className = 'modal__thumbnail modal__thumbnail--video';
+      videoThumb.innerHTML = `
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="#f4d03f">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+      `;
+      videoThumb.onclick = () => {
+        showSlide(videoIndex);
+      };
+      thumbnails.appendChild(videoThumb);
+    }
     
     gallery.appendChild(thumbnails);
     this.body.appendChild(gallery);
