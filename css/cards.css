@@ -67,26 +67,29 @@
 
 .card__badges {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 8px;
+  left: 8px;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 4px;
   z-index: 2;
-  max-width: calc(100% - 20px);
+  max-width: calc(100% - 16px);
 }
 
 .card__badge {
   background-color: var(--color-secondary);
   color: var(--color-text-dark);
-  padding: 5px 10px;
-  font-size: 11px;
+  padding: 3px 8px;
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
   white-space: nowrap;
   border-radius: 3px;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .card__badge--dark {
@@ -787,6 +790,9 @@ body.modal-open {
 /* Filter button hover animation */
 .filter-btn {
   transition: all 0.3s ease, transform 0.2s ease;
+  background-color: #3a3a3a;
+  color: #ffffff;
+  border: 1px solid #444;
 }
 
 .filter-btn:hover {
@@ -795,4 +801,10 @@ body.modal-open {
 
 .filter-btn:active {
   transform: translateY(0);
+}
+
+.filter-btn--active {
+  background-color: #f4d03f !important;
+  color: #1a1a1a !important;
+  border-color: #f4d03f !important;
 }
