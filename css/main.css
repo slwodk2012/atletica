@@ -165,7 +165,7 @@ button {
   left: 0 !important;
   width: 100% !important;
   height: 100% !important;
-  background: rgba(0, 0, 0, 0.45) !important;
+  background: rgba(0, 0, 0, 0.9) !important;
   z-index: 1 !important;
   pointer-events: none;
 }
