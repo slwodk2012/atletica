@@ -1974,16 +1974,25 @@ export class Auth {
 
   // Load and apply saved settings on page load
   loadSavedSettings() {
-    const settings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
-    if (Object.keys(settings).length > 0) {
-      this.applyContentSettings(settings);
+    try {
+      const settingsStr = localStorage.getItem('siteSettings');
+      if (!settingsStr) return;
       
-      // Apply saved filters after a short delay (wait for DOM)
-      if (settings.filters && settings.filters.length > 0) {
-        setTimeout(() => {
-          this.updatePageFilters(settings.filters);
-        }, 500);
+      const settings = JSON.parse(settingsStr);
+      if (settings && Object.keys(settings).length > 0) {
+        this.applyContentSettings(settings);
+        
+        // Apply saved filters after a short delay (wait for DOM)
+        if (settings.filters && settings.filters.length > 0) {
+          setTimeout(() => {
+            this.updatePageFilters(settings.filters);
+          }, 500);
+        }
       }
+    } catch (e) {
+      console.warn('Error loading saved settings:', e);
+      // Clear corrupted settings
+      localStorage.removeItem('siteSettings');
     }
   }
 
