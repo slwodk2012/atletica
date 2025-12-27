@@ -97,9 +97,8 @@ const DEFAULT_DESIGN_SETTINGS = {
   filters: [
     { id: 1, text: 'Фитнес', filter: 'all', color: '#f4d03f', textColor: '#1a1a1a' },
     { id: 2, text: 'Кроссфит', filter: 'Кроссфит', color: '#3a3a3a', textColor: '#ffffff' },
-    { id: 3, text: 'Бодибилдинг', filter: 'Бодибилдинг', color: '#3a3a3a', textColor: '#ffffff' },
-    { id: 4, text: 'Бокс', filter: 'Бокс', color: '#3a3a3a', textColor: '#ffffff' },
-    { id: 5, text: 'Боевые единоборства', filter: 'Единоборства', color: '#3a3a3a', textColor: '#ffffff' }
+    { id: 3, text: 'Бокс', filter: 'Бокс', color: '#3a3a3a', textColor: '#ffffff' },
+    { id: 4, text: 'Боевые единоборства', filter: 'Единоборства', color: '#3a3a3a', textColor: '#ffffff' }
   ]
 };
 
