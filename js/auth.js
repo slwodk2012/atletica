@@ -54,14 +54,12 @@ export class Auth {
   }
 
   async init() {
-    // Check Firebase auth state
-    setTimeout(async () => {
-      if (this.firebaseManager.isAuthenticated()) {
-        this.isAuthenticated = true;
-        this.currentUser = this.firebaseManager.getCurrentUser();
-        this.showAdminMenu();
-      }
-    }, 1000);
+    // Check session auth state
+    if (sessionStorage.getItem('adminAuth') === 'true') {
+      this.isAuthenticated = true;
+      this.currentUser = { username: 'AtleticaAdmin2032', role: 'admin' };
+      this.showAdminMenu();
+    }
     
     // Clear old undo history to prevent quota issues
     try {
@@ -179,7 +177,7 @@ export class Auth {
   }
 
   async handleLogin() {
-    const email = document.getElementById('loginUsername').value;
+    const username = document.getElementById('loginUsername').value.trim();
     const password = document.getElementById('loginPassword').value;
     
     // Show loading
@@ -189,12 +187,17 @@ export class Auth {
     submitBtn.disabled = true;
 
     try {
-      // Login via Firebase Auth
-      const result = await this.firebaseManager.login(email, password);
+      // Admin credentials
+      const ADMIN_LOGIN = 'AtleticaAdmin2032';
+      const ADMIN_PASSWORD = 'AtleticaADM102@';
       
-      if (result.success) {
+      // Check credentials
+      if (username === ADMIN_LOGIN && password === ADMIN_PASSWORD) {
         this.isAuthenticated = true;
-        this.currentUser = result.user;
+        this.currentUser = { username: ADMIN_LOGIN, role: 'admin' };
+        
+        // Save session
+        sessionStorage.setItem('adminAuth', 'true');
         
         this.showAdminMenu();
         this.closeLoginModal();
@@ -204,7 +207,7 @@ export class Auth {
         document.getElementById('hamburger').classList.remove('active');
         document.getElementById('sideMenu').classList.remove('active');
       } else {
-        showToast('Неверный email или пароль', 'error');
+        showToast('Неверный логин или пароль', 'error');
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -216,21 +219,18 @@ export class Auth {
   }
 
   async handleLogout() {
-    try {
-      await this.firebaseManager.logout();
-      this.isAuthenticated = false;
-      this.currentUser = null;
-      
-      this.showGuestMenu();
-      showToast('Вы вышли из системы', 'info');
-      
-      // Close side menu
-      document.getElementById('hamburger').classList.remove('active');
-      document.getElementById('sideMenu').classList.remove('active');
-    } catch (error) {
-      console.error('Logout error:', error);
-      showToast('Ошибка выхода', 'error');
-    }
+    this.isAuthenticated = false;
+    this.currentUser = null;
+    
+    // Clear session
+    sessionStorage.removeItem('adminAuth');
+    
+    this.showGuestMenu();
+    showToast('Вы вышли из системы', 'info');
+    
+    // Close side menu
+    document.getElementById('hamburger').classList.remove('active');
+    document.getElementById('sideMenu').classList.remove('active');
   }
 
   showAdminMenu() {

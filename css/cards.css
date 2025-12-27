@@ -67,29 +67,74 @@
 
 .card__badges {
   position: absolute;
-  top: 6px;
-  left: 6px;
+  top: 8px;
+  left: 8px;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  gap: 3px;
+  gap: 4px;
   z-index: 2;
-  max-width: calc(100% - 12px);
+  max-width: calc(100% - 16px);
 }
 
 .card__badge {
   background-color: var(--color-secondary);
   color: var(--color-text-dark);
-  padding: 2px 5px;
-  font-size: 8px;
+  padding: 4px 8px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.2px;
+  letter-spacing: 0.3px;
   white-space: nowrap;
-  border-radius: 2px;
-  max-width: 80px;
+  border-radius: 3px;
+  max-width: 120px;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Badge responsive - Tablet */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .card__badges {
+    top: 10px;
+    left: 10px;
+    gap: 5px;
+  }
+  
+  .card__badge {
+    padding: 5px 10px;
+    font-size: 12px;
+    max-width: 140px;
+  }
+}
+
+/* Badge responsive - Desktop */
+@media (min-width: 1024px) {
+  .card__badges {
+    top: 12px;
+    left: 12px;
+    gap: 6px;
+  }
+  
+  .card__badge {
+    padding: 5px 12px;
+    font-size: 12px;
+    max-width: 150px;
+  }
+}
+
+/* Badge responsive - Mobile */
+@media (max-width: 767px) {
+  .card__badges {
+    top: 5px;
+    left: 5px;
+    gap: 3px;
+  }
+  
+  .card__badge {
+    padding: 3px 6px;
+    font-size: 9px;
+    max-width: 90px;
+  }
 }
 
 .card__badge--dark {
