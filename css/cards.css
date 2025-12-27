@@ -67,12 +67,13 @@
 
 .card__badges {
   position: absolute;
-  top: 8px;
+  bottom: 8px;
   left: 8px;
+  top: auto;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 3px;
   z-index: 2;
   max-width: calc(100% - 16px);
 }
@@ -80,14 +81,14 @@
 .card__badge {
   background-color: var(--color-secondary);
   color: var(--color-text-dark);
-  padding: 3px 8px;
-  font-size: 10px;
+  padding: 2px 6px;
+  font-size: 9px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.3px;
   white-space: nowrap;
   border-radius: 3px;
-  max-width: 120px;
+  max-width: 100px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -790,9 +791,9 @@ body.modal-open {
 /* Filter button hover animation */
 .filter-btn {
   transition: all 0.3s ease, transform 0.2s ease;
-  background-color: #3a3a3a;
-  color: #ffffff;
-  border: 1px solid #444;
+  background-color: #3a3a3a !important;
+  color: #ffffff !important;
+  border: 1px solid #444 !important;
 }
 
 .filter-btn:hover {
@@ -803,7 +804,8 @@ body.modal-open {
   transform: translateY(0);
 }
 
-.filter-btn--active {
+.filter-btn.filter-btn--active,
+.filter-btn[class*="filter-btn--active"] {
   background-color: #f4d03f !important;
   color: #1a1a1a !important;
   border-color: #f4d03f !important;

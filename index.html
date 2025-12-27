@@ -373,8 +373,7 @@
     <!-- Hero Section -->
     <section class="hero">
         <!-- Video Background -->
-        <video class="hero__video-bg" autoplay muted loop playsinline webkit-playsinline preload="auto">
-            <source src="oblozhka_mobile.mp4" type="video/mp4">
+        <video class="hero__video-bg" id="heroVideo" autoplay muted loop playsinline webkit-playsinline x-webkit-airplay="allow" preload="auto" poster="images/hero-poster.jpg">
             <source src="ОБЛОЖКА.mp4" type="video/mp4">
         </video>
         <div class="hero__overlay"></div>
@@ -499,5 +498,45 @@
     </div>
 
     <script type="module" src="js/app.js"></script>
+    
+    <!-- iOS Video Fix -->
+    <script>
+    (function() {
+        var video = document.getElementById('heroVideo');
+        if (!video) return;
+        
+        // Force play on iOS
+        function tryPlay() {
+            var playPromise = video.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(function(error) {
+                    console.log('Video autoplay blocked:', error);
+                });
+            }
+        }
+        
+        // Try to play immediately
+        tryPlay();
+        
+        // Also try on user interaction
+        document.addEventListener('touchstart', function() {
+            tryPlay();
+        }, { once: true });
+        
+        document.addEventListener('click', function() {
+            tryPlay();
+        }, { once: true });
+        
+        // Ensure video is muted (required for autoplay on iOS)
+        video.muted = true;
+        video.setAttribute('muted', '');
+        video.setAttribute('playsinline', '');
+        video.setAttribute('webkit-playsinline', '');
+        
+        // Try again when video is ready
+        video.addEventListener('loadeddata', tryPlay);
+        video.addEventListener('canplay', tryPlay);
+    })();
+    </script>
 </body>
 </html>
