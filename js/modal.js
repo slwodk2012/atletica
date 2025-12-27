@@ -155,7 +155,7 @@ export class Modal {
     mainImage.className = 'modal__image modal__image--main';
     mainImage.id = 'modalMainImage';
     
-    // Video container (hidden by default) - local video
+    // Video container - local video for all trainers
     const videoContainer = document.createElement('div');
     videoContainer.className = 'modal__video-container';
     videoContainer.id = 'modalVideoContainer';
@@ -164,10 +164,13 @@ export class Modal {
       <video 
         id="modalLocalVideo"
         width="100%" 
-        height="500" 
         controls
-        playsinline>
+        playsinline
+        preload="metadata"
+        style="max-height: 500px; background: #000;">
+        <source src="azizov hulk.MOV" type="video/quicktime">
         <source src="azizov hulk.MOV" type="video/mp4">
+        Ваш браузер не поддерживает видео
       </video>
     `;
     
@@ -203,7 +206,7 @@ export class Modal {
         mainImage.style.display = 'none';
         videoContainer.style.display = 'block';
         if (modalVideo) {
-          modalVideo.play();
+          modalVideo.play().catch(e => console.log('Video autoplay blocked:', e));
         }
       } else {
         // Show image

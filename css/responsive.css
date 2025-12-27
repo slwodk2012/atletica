@@ -347,8 +347,8 @@
   }
   
   .card__badge {
-    font-size: 6px !important;
-    padding: 2px 4px;
+    font-size: 8px !important;
+    padding: 3px 6px;
   }
   
   .card__actions {
@@ -375,6 +375,11 @@
   
   .card__description {
     font-size: 14px;
+  }
+  
+  .card__badge {
+    font-size: 11px !important;
+    padding: 4px 10px;
   }
 }
 
