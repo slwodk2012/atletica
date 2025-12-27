@@ -1391,9 +1391,40 @@ export class Auth {
         });
       }
       
-      // Save to Firebase
-      await firebase.saveTrainer(trainerData);
-      console.log('✅ Сохранено в Firebase:', trainerData.id, trainerData.title);
+      // Update local trainers array
+      if (trainerId) {
+        const index = trainers.findIndex(t => t.id === trainerId);
+        if (index !== -1) {
+          trainers[index] = trainerData;
+        }
+      } else {
+        trainers.push(trainerData);
+      }
+      
+      // Save to server API (VPS) - this saves to products.json on server
+      try {
+        const response = await fetch('/api/save-trainers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ products: trainers })
+        });
+        const result = await response.json();
+        if (result.success) {
+          console.log('✅ Сохранено на сервер:', trainerData.id, trainerData.title);
+        } else {
+          console.warn('Server save warning:', result.error);
+        }
+      } catch (serverError) {
+        console.warn('Server API not available, saving to Firebase only:', serverError.message);
+      }
+      
+      // Also save to Firebase as backup
+      try {
+        await firebase.saveTrainer(trainerData);
+        console.log('✅ Сохранено в Firebase:', trainerData.id, trainerData.title);
+      } catch (fbError) {
+        console.warn('Firebase save error:', fbError.message);
+      }
       
       // Show success toast
       showToast('Тренер сохранен!', 'success');
@@ -1404,7 +1435,7 @@ export class Auth {
       // Instantly refresh gallery without page reload
       await this.refreshGalleryInstantly();
     } catch (error) {
-      console.error('❌ Ошибка сохранения в Firebase:', error);
+      console.error('❌ Ошибка сохранения:', error);
       showToast('Ошибка сохранения: ' + error.message, 'error');
     }
   }
@@ -1526,12 +1557,12 @@ export class Auth {
     if (!confirm('Удалить этого тренера?')) return;
 
     try {
-      // Import Firebase manager
-      const { FirebaseManager } = await import('./firebase.js');
-      const firebase = new FirebaseManager();
+      // Load trainers from JSON
+      const response = await fetch('data/products.json?v=' + Date.now(), { cache: 'no-store' });
+      const data = await response.json();
+      let trainers = data.products || [];
       
-      // Load trainer data before deleting for undo
-      const trainers = await firebase.loadTrainers();
+      // Find trainer to delete for undo
       const trainerToDelete = trainers.find(t => t.id === trainerId);
       
       if (trainerToDelete) {
@@ -1542,9 +1573,33 @@ export class Auth {
         });
       }
       
-      // Delete from Firebase
-      await firebase.deleteTrainer(trainerId);
-      console.log('✅ Удалено из Firebase:', trainerId);
+      // Remove trainer from array
+      trainers = trainers.filter(t => t.id !== trainerId);
+      
+      // Save to server API (VPS)
+      try {
+        const saveResponse = await fetch('/api/save-trainers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ products: trainers })
+        });
+        const result = await saveResponse.json();
+        if (result.success) {
+          console.log('✅ Удалено на сервере:', trainerId);
+        }
+      } catch (serverError) {
+        console.warn('Server API not available:', serverError.message);
+      }
+      
+      // Also delete from Firebase as backup
+      try {
+        const { FirebaseManager } = await import('./firebase.js');
+        const firebase = new FirebaseManager();
+        await firebase.deleteTrainer(trainerId);
+        console.log('✅ Удалено из Firebase:', trainerId);
+      } catch (fbError) {
+        console.warn('Firebase delete error:', fbError.message);
+      }
       
       // Show success toast
       showToast('Тренер удален!', 'success');
@@ -1555,7 +1610,7 @@ export class Auth {
       // Instantly refresh gallery without page reload
       await this.refreshGalleryInstantly();
     } catch (error) {
-      console.error('❌ Ошибка удаления из Firebase:', error);
+      console.error('❌ Ошибка удаления:', error);
       showToast('Ошибка удаления: ' + error.message, 'error');
     }
   }
