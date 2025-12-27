@@ -2213,6 +2213,14 @@ export class Auth {
       if (settings && Object.keys(settings).length > 0) {
         this.applyContentSettings(settings);
         
+        // Apply hero overlay immediately
+        if (settings.heroOverlay !== undefined) {
+          const overlay = document.querySelector('.hero__overlay');
+          if (overlay) {
+            overlay.style.background = `rgba(0, 0, 0, ${settings.heroOverlay})`;
+          }
+        }
+        
         // Apply saved filters after a short delay (wait for DOM)
         if (settings.filters && settings.filters.length > 0) {
           setTimeout(() => {
