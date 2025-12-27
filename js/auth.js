@@ -1705,15 +1705,37 @@ export class Auth {
       </button>
     `).join('');
     
-    // Re-attach event listeners
+    // Re-attach event listeners directly to filter gallery
     filtersContainer.querySelectorAll('.filter-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', async (e) => {
         const filter = e.target.getAttribute('data-filter');
-        filtersContainer.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('filter-btn--active'));
+        
+        // Update active button style
+        filtersContainer.querySelectorAll('.filter-btn').forEach(b => {
+          b.classList.remove('filter-btn--active');
+        });
         e.target.classList.add('filter-btn--active');
         
-        // Trigger filter (dispatch custom event)
-        window.dispatchEvent(new CustomEvent('filterChange', { detail: { filter } }));
+        // Filter products directly
+        try {
+          const response = await fetch('data/products.json?v=' + Date.now(), { cache: 'no-store' });
+          const data = await response.json();
+          let products = data.products || [];
+          
+          if (filter !== 'all') {
+            products = products.filter(p => p.category && p.category.includes(filter));
+          }
+          
+          // Re-render gallery
+          const gallery = document.getElementById('gallery');
+          if (gallery) {
+            const { CardRenderer } = await import('./cardRenderer.js');
+            const cardRenderer = new CardRenderer();
+            cardRenderer.renderGallery(products, gallery, 50);
+          }
+        } catch (error) {
+          console.error('Filter error:', error);
+        }
       });
     });
   }
@@ -1945,6 +1967,13 @@ export class Auth {
     const settings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
     if (Object.keys(settings).length > 0) {
       this.applyContentSettings(settings);
+      
+      // Apply saved filters after a short delay (wait for DOM)
+      if (settings.filters && settings.filters.length > 0) {
+        setTimeout(() => {
+          this.updatePageFilters(settings.filters);
+        }, 500);
+      }
     }
   }
 
