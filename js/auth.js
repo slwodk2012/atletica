@@ -1287,24 +1287,20 @@ export class Auth {
   async saveDetailedTrainer(trainerId) {
     console.log('Начало сохранения тренера:', trainerId);
     
-    // Import Firebase manager
+    // Import Firebase manager for backup save
     const { FirebaseManager } = await import('./firebase.js');
     const firebase = new FirebaseManager();
     
-    // Load trainers from Firebase first
+    // ALWAYS load trainers from JSON on server (not Firebase - it has old data without images)
     let trainers = [];
     try {
-      trainers = await firebase.loadTrainers();
-      console.log('Загружено из Firebase:', trainers.length);
+      const response = await fetch('data/products.json?v=' + Date.now(), { cache: 'no-store' });
+      const data = await response.json();
+      trainers = data.products || [];
+      console.log('Загружено из JSON:', trainers.length);
     } catch (e) {
-      console.warn('Firebase load error, trying JSON:', e);
-      try {
-        const response = await fetch('data/products.json');
-        const data = await response.json();
-        trainers = data.products || [];
-      } catch (e2) {
-        trainers = [];
-      }
+      console.error('JSON load error:', e);
+      trainers = [];
     }
     
     console.log('Текущие тренеры:', trainers.length);
