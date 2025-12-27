@@ -177,6 +177,7 @@ button {
   color: var(--color-text);
   position: relative;
   z-index: 2;
+  background: transparent !important;
 }
 
 /* Logo Wrapper - Simple container */
