@@ -506,9 +506,9 @@ export class Auth {
                 <input type="text" id="heroBackground" value="${settings.heroBackground || ''}" placeholder="https://...">
               </div>
               <div class="admin-form__group">
-                <label>Затемнение фона (0-1)</label>
-                <input type="range" id="heroOverlay" min="0" max="1" step="0.1" value="${settings.heroOverlay || 0.7}">
-                <span id="heroOverlayValue">${settings.heroOverlay || 0.7}</span>
+                <label>Затемнение обложки (%)</label>
+                <input type="range" id="heroOverlay" min="0" max="100" step="5" value="${Math.round((settings.heroOverlay || 0.9) * 100)}">
+                <span id="heroOverlayValue">${Math.round((settings.heroOverlay || 0.9) * 100)}%</span>
               </div>
               <div class="admin-form__group">
                 <label>Высота Hero секции (vh)</label>
@@ -773,7 +773,8 @@ export class Auth {
         const value = e.target.value;
         const unit = valueId.includes('Radius') || valueId.includes('Gap') || valueId.includes('Padding') || valueId.includes('Size') ? 'px' : 
                      valueId.includes('Height') ? 'vh' : 
-                     valueId.includes('Speed') ? 'ms' : '';
+                     valueId.includes('Speed') ? 'ms' : 
+                     valueId.includes('Overlay') ? '%' : '';
         valueDisplay.textContent = value + unit;
       });
     };
@@ -1873,7 +1874,7 @@ export class Auth {
       
       // Hero
       heroBackground: document.getElementById('heroBackground').value,
-      heroOverlay: document.getElementById('heroOverlay').value,
+      heroOverlay: document.getElementById('heroOverlay').value / 100, // Convert % to decimal
       heroHeight: document.getElementById('heroHeight').value,
       
       // Icons
@@ -2119,7 +2120,7 @@ export class Auth {
     if (settings.heroOverlay) {
       const hero = document.querySelector('.hero');
       if (hero) {
-        const overlay = hero.querySelector('.hero__container');
+        const overlay = hero.querySelector('.hero__overlay');
         if (overlay) {
           overlay.style.background = `rgba(0, 0, 0, ${settings.heroOverlay})`;
         }
