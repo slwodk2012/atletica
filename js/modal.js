@@ -160,16 +160,34 @@ export class Modal {
     const globalVideoEnabled = settings.globalVideoEnabled !== false;
     const globalVideoUrl = settings.globalVideo || 'azizov hulk.MOV';
     
-    // Check if trainer has personal video
-    const hasPersonalVideo = product.videos && product.videos.length > 0 && product.videos[0];
-    const videoToUse = hasPersonalVideo ? product.videos[0] : globalVideoUrl;
-    const showVideo = globalVideoEnabled || hasPersonalVideo;
+    // Get personal videos of trainer
+    const personalVideos = (product.videos && product.videos.length > 0) 
+      ? product.videos.filter(v => v && v.trim() !== '') 
+      : [];
     
-    // Video container - local video for all trainers
+    // Build list of all videos to show
+    const allVideos = [];
+    
+    // Add global video first if enabled
+    if (globalVideoEnabled && globalVideoUrl) {
+      allVideos.push({ url: globalVideoUrl, label: 'Видео зала' });
+    }
+    
+    // Add personal videos
+    personalVideos.forEach((v, i) => {
+      allVideos.push({ url: v, label: `Видео ${i + 1}` });
+    });
+    
+    const showVideo = allVideos.length > 0;
+    
+    // Video container
     const videoContainer = document.createElement('div');
     videoContainer.className = 'modal__video-container';
     videoContainer.id = 'modalVideoContainer';
     videoContainer.style.display = 'none';
+    
+    // Current video index (for multiple videos)
+    let currentVideoIndex = 0;
     
     if (showVideo) {
       videoContainer.innerHTML = `
@@ -180,8 +198,8 @@ export class Modal {
           playsinline
           preload="metadata"
           style="max-height: 500px; background: #000;">
-          <source src="${videoToUse}" type="video/mp4">
-          <source src="${videoToUse}" type="video/quicktime">
+          <source src="${allVideos[0].url}" type="video/mp4">
+          <source src="${allVideos[0].url}" type="video/quicktime">
           Ваш браузер не поддерживает видео
         </video>
       `;
@@ -199,9 +217,9 @@ export class Modal {
       images = [product.image];
     }
 
-    // Total slides = images + 1 video (if enabled)
-    const totalSlides = showVideo ? images.length + 1 : images.length;
-    const videoIndex = images.length; // Video is the last slide
+    // Total slides = images + all videos
+    const totalSlides = images.length + allVideos.length;
+    const firstVideoIndex = images.length; // First video starts after images
 
     // Current slide index
     let currentSlide = 0;
@@ -214,11 +232,20 @@ export class Modal {
       
       const modalVideo = document.getElementById('modalLocalVideo');
       
-      if (showVideo && currentSlide === videoIndex) {
+      // Check if current slide is a video
+      const isVideoSlide = showVideo && currentSlide >= firstVideoIndex;
+      
+      if (isVideoSlide) {
         // Show video
+        const videoIdx = currentSlide - firstVideoIndex;
         mainImage.style.display = 'none';
         videoContainer.style.display = 'block';
-        if (modalVideo) {
+        if (modalVideo && allVideos[videoIdx]) {
+          if (currentVideoIndex !== videoIdx) {
+            currentVideoIndex = videoIdx;
+            modalVideo.src = allVideos[videoIdx].url;
+            modalVideo.load();
+          }
           modalVideo.play().catch(e => console.log('Video autoplay blocked:', e));
         }
       } else {
@@ -229,7 +256,9 @@ export class Modal {
           modalVideo.pause();
           modalVideo.currentTime = 0;
         }
-        mainImage.src = images[currentSlide];
+        if (images[currentSlide]) {
+          mainImage.src = images[currentSlide];
+        }
       }
       
       // Update thumbnails
@@ -309,19 +338,30 @@ export class Modal {
       thumbnails.appendChild(thumb);
     });
     
-    // Video thumbnail at the end (only if video is enabled)
+    // Video thumbnail at the end (for each video)
     if (showVideo) {
-      const videoThumb = document.createElement('div');
-      videoThumb.className = 'modal__thumbnail modal__thumbnail--video';
-      videoThumb.innerHTML = `
-        <svg viewBox="0 0 24 24" width="30" height="30" fill="#f4d03f">
-          <path d="M8 5v14l11-7z"/>
-        </svg>
-      `;
-      videoThumb.onclick = () => {
-        showSlide(videoIndex);
-      };
-      thumbnails.appendChild(videoThumb);
+      allVideos.forEach((videoObj, vIndex) => {
+        const videoThumb = document.createElement('div');
+        videoThumb.className = 'modal__thumbnail modal__thumbnail--video';
+        videoThumb.title = videoObj.label;
+        videoThumb.innerHTML = `
+          <svg viewBox="0 0 24 24" width="30" height="30" fill="#f4d03f">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+        `;
+        const videoSlideIndex = images.length + vIndex;
+        videoThumb.onclick = () => {
+          // Update video source if multiple videos
+          const modalVideo = document.getElementById('modalLocalVideo');
+          if (modalVideo && currentVideoIndex !== vIndex) {
+            currentVideoIndex = vIndex;
+            modalVideo.src = videoObj.url;
+            modalVideo.load();
+          }
+          showSlide(videoSlideIndex);
+        };
+        thumbnails.appendChild(videoThumb);
+      });
     }
     
     gallery.appendChild(thumbnails);
