@@ -133,6 +133,30 @@ class App {
         this.handleFilterClick(e.target);
       });
     });
+    
+    // Listen for filter changes from admin panel
+    window.addEventListener('filterChange', (e) => {
+      const filter = e.detail.filter;
+      this.applyFilter(filter);
+    });
+  }
+  
+  /**
+   * Apply filter to products
+   * @param {string} filter - Filter value
+   */
+  applyFilter(filter) {
+    const validProducts = this.dataManager.getValidProducts();
+    let filteredProducts = validProducts;
+
+    if (filter !== 'all') {
+      filteredProducts = validProducts.filter(product => {
+        return product.category && product.category.includes(filter);
+      });
+    }
+
+    // Re-render gallery
+    this.cardRenderer.renderGallery(filteredProducts, this.galleryContainer, 50);
   }
 
   /**
