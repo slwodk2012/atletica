@@ -518,6 +518,35 @@ export class Auth {
             </div>
           </div>
 
+          <!-- Hero Video Section -->
+          <div class="admin-content-section">
+            <h3 class="admin-content-section__title">🎥 Видео обложки</h3>
+            <p style="color: #999; font-size: 13px; margin-bottom: 15px;">
+              Видео которое воспроизводится на главном экране сайта
+            </p>
+            <div class="admin-form">
+              <div class="admin-form__group">
+                <label>Текущее видео обложки</label>
+                <div class="photo-input-wrapper">
+                  <input type="text" id="heroVideoUrl" value="${settings.heroVideo || 'ОБЛОЖКА.mp4'}" placeholder="URL видео или загрузите файл">
+                  <label class="photo-upload-btn" for="heroVideoFile">
+                    Загрузить видео
+                  </label>
+                  <input type="file" id="heroVideoFile" accept="video/mp4,video/quicktime,video/webm" style="display: none;">
+                </div>
+                <p style="color: #666; font-size: 11px; margin-top: 5px;">
+                  Рекомендуемый формат: MP4 (H.264), до 100MB
+                </p>
+              </div>
+              <div id="heroVideoPreview" style="margin-top: 10px;">
+                <video src="${settings.heroVideo || 'ОБЛОЖКА.mp4'}" style="max-width: 300px; border-radius: 8px;" controls muted></video>
+              </div>
+              <button type="button" class="admin-btn admin-btn--add admin-btn--small" id="applyHeroVideoBtn" style="margin-top: 10px;">
+                Применить видео
+              </button>
+            </div>
+          </div>
+
           <!-- Icons Section -->
           <div class="admin-content-section">
             <h3 class="admin-content-section__title">🎯 Иконки</h3>
@@ -737,6 +766,84 @@ export class Auth {
         localStorage.removeItem('siteSettings');
         showToast('Настройки сброшены!', 'success');
         setTimeout(() => window.location.reload(), 1000);
+      }
+    });
+    
+    // Hero video upload handler
+    document.getElementById('heroVideoFile')?.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      if (file.size > 100 * 1024 * 1024) {
+        showToast('Файл слишком большой (макс. 100MB)', 'error');
+        return;
+      }
+      
+      showToast('Загрузка видео...', 'info');
+      
+      try {
+        const formData = new FormData();
+        formData.append('video', file);
+        formData.append('type', 'hero');
+        
+        const response = await fetch('/api/upload-video', {
+          method: 'POST',
+          body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          document.getElementById('heroVideoUrl').value = result.url;
+          const preview = document.querySelector('#heroVideoPreview video');
+          if (preview) {
+            preview.src = result.url + '?v=' + Date.now();
+          }
+          showToast('Видео загружено!', 'success');
+        } else {
+          showToast('Ошибка: ' + result.error, 'error');
+        }
+      } catch (error) {
+        console.error('Upload error:', error);
+        showToast('Ошибка загрузки видео', 'error');
+      }
+    });
+    
+    // Apply hero video button
+    document.getElementById('applyHeroVideoBtn')?.addEventListener('click', async () => {
+      const videoUrl = document.getElementById('heroVideoUrl').value.trim();
+      if (!videoUrl) {
+        showToast('Укажите URL видео', 'error');
+        return;
+      }
+      
+      try {
+        const response = await fetch('/api/hero-video', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ heroVideo: videoUrl })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          // Update video on page
+          const heroVideo = document.querySelector('.hero__video-bg');
+          if (heroVideo) {
+            const source = heroVideo.querySelector('source');
+            if (source) {
+              source.src = videoUrl;
+            }
+            heroVideo.load();
+            heroVideo.play();
+          }
+          showToast('Видео обложки обновлено!', 'success');
+        } else {
+          showToast('Ошибка: ' + result.error, 'error');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        showToast('Ошибка сохранения', 'error');
       }
     });
     
@@ -1111,12 +1218,38 @@ export class Auth {
         const file = e.target.files[0];
         if (!file) return;
         
+        if (file.size > 100 * 1024 * 1024) {
+          showToast('Файл слишком большой (макс. 100MB)', 'error');
+          return;
+        }
+        
         const index = e.target.dataset.index;
         const videoInput = document.querySelector(`.video-input[data-index="${index}"]`);
         
-        // Для видео сохраняем имя файла (в реальном проекте нужен сервер для загрузки)
-        videoInput.value = `video_${file.name}`;
-        alert('Видео выбрано: ' + file.name + '\n\nВажно: Для загрузки видео на сайт нужен сервер. Пока можно использовать YouTube ссылки.');
+        showToast('Загрузка видео...', 'info');
+        
+        try {
+          const formData = new FormData();
+          formData.append('video', file);
+          formData.append('type', 'trainer');
+          
+          const response = await fetch('/api/upload-video', {
+            method: 'POST',
+            body: formData
+          });
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            videoInput.value = result.url;
+            showToast('Видео загружено: ' + result.filename, 'success');
+          } else {
+            showToast('Ошибка: ' + result.error, 'error');
+          }
+        } catch (error) {
+          console.error('Upload error:', error);
+          showToast('Ошибка загрузки видео', 'error');
+        }
       });
     });
 

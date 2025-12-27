@@ -169,6 +169,147 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // API: Upload video
+  if (req.method === 'POST' && req.url === '/api/upload-video') {
+    const chunks = [];
+    let totalSize = 0;
+    const maxSize = 100 * 1024 * 1024; // 100MB limit
+    
+    req.on('data', chunk => {
+      totalSize += chunk.length;
+      if (totalSize > maxSize) {
+        res.writeHead(413, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: 'File too large (max 100MB)' }));
+        req.destroy();
+        return;
+      }
+      chunks.push(chunk);
+    });
+    
+    req.on('end', () => {
+      try {
+        const buffer = Buffer.concat(chunks);
+        
+        // Parse multipart form data manually
+        const boundary = req.headers['content-type'].split('boundary=')[1];
+        const parts = buffer.toString('binary').split('--' + boundary);
+        
+        let filename = '';
+        let fileData = null;
+        let videoType = 'trainer'; // or 'hero'
+        
+        for (const part of parts) {
+          if (part.includes('filename=')) {
+            const filenameMatch = part.match(/filename="([^"]+)"/);
+            if (filenameMatch) {
+              filename = filenameMatch[1];
+            }
+            
+            const typeMatch = part.match(/name="type"[\r\n]+([^\r\n]+)/);
+            if (typeMatch) {
+              videoType = typeMatch[1].trim();
+            }
+            
+            // Extract file content
+            const headerEnd = part.indexOf('\r\n\r\n');
+            if (headerEnd !== -1) {
+              const content = part.substring(headerEnd + 4);
+              // Remove trailing boundary markers
+              const endIndex = content.lastIndexOf('\r\n');
+              fileData = Buffer.from(content.substring(0, endIndex), 'binary');
+            }
+          }
+          
+          if (part.includes('name="type"') && !part.includes('filename=')) {
+            const valueStart = part.indexOf('\r\n\r\n');
+            if (valueStart !== -1) {
+              videoType = part.substring(valueStart + 4).trim().replace(/[\r\n-]/g, '');
+            }
+          }
+        }
+        
+        if (!filename || !fileData) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: false, error: 'No file uploaded' }));
+          return;
+        }
+        
+        // Generate safe filename
+        const ext = path.extname(filename).toLowerCase() || '.mp4';
+        const safeName = 'video_' + Date.now() + ext;
+        const savePath = videoType === 'hero' 
+          ? path.join(__dirname, safeName)
+          : path.join(__dirname, 'videos', safeName);
+        
+        // Create videos directory if needed
+        if (videoType !== 'hero') {
+          const videosDir = path.join(__dirname, 'videos');
+          if (!fs.existsSync(videosDir)) {
+            fs.mkdirSync(videosDir, { recursive: true });
+          }
+        }
+        
+        fs.writeFileSync(savePath, fileData);
+        
+        const videoUrl = videoType === 'hero' ? '/' + safeName : '/videos/' + safeName;
+        console.log(`[${new Date().toISOString()}] Uploaded video: ${videoUrl}`);
+        
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, url: videoUrl, filename: safeName }));
+      } catch (error) {
+        console.error('Upload error:', error);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: error.message }));
+      }
+    });
+    return;
+  }
+
+  // API: Get/Set hero video
+  if (req.url === '/api/hero-video') {
+    const settingsFile = path.join(__dirname, 'data', 'settings.json');
+    
+    if (req.method === 'GET') {
+      try {
+        if (fs.existsSync(settingsFile)) {
+          const settings = JSON.parse(fs.readFileSync(settingsFile, 'utf8'));
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ heroVideo: settings.heroVideo || 'ОБЛОЖКА.mp4' }));
+        } else {
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ heroVideo: 'ОБЛОЖКА.mp4' }));
+        }
+      } catch (error) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: error.message }));
+      }
+      return;
+    }
+    
+    if (req.method === 'POST') {
+      let body = '';
+      req.on('data', chunk => body += chunk);
+      req.on('end', () => {
+        try {
+          const { heroVideo } = JSON.parse(body);
+          let settings = {};
+          if (fs.existsSync(settingsFile)) {
+            settings = JSON.parse(fs.readFileSync(settingsFile, 'utf8'));
+          }
+          settings.heroVideo = heroVideo;
+          fs.writeFileSync(settingsFile, JSON.stringify(settings, null, 2), 'utf8');
+          console.log(`[${new Date().toISOString()}] Updated hero video: ${heroVideo}`);
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: true }));
+        } catch (error) {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: false, error: error.message }));
+        }
+      });
+      return;
+    }
+  }
+
   // Static files
   let filePath = req.url.split('?')[0]; // Remove query string
   if (filePath === '/') filePath = '/index.html';
