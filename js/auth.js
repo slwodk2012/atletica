@@ -38,6 +38,71 @@ function showToast(message, type = 'info') {
 // Make it globally available
 window.showToast = showToast;
 
+// Default design settings - current working version
+const DEFAULT_DESIGN_SETTINGS = {
+  // Colors
+  bgColor: '#1a1a1a',
+  accentColor: '#f4d03f',
+  cardColor: '#3a3a3a',
+  textColor: '#ffffff',
+  
+  // Typography
+  fontFamily: "'Inter', sans-serif",
+  fontSize: 16,
+  heroTitleSize: 72,
+  sectionTitleSize: 64,
+  
+  // Buttons
+  buttonRadius: 8,
+  buttonSize: 'medium',
+  buttonStyle: 'solid',
+  showButtonIcons: true,
+  
+  // Cards
+  cardRadius: 12,
+  cardShadow: 'medium',
+  cardHoverEffect: 'lift',
+  
+  // Spacing
+  cardGap: 24,
+  sectionPadding: 60,
+  maxWidth: 1400,
+  
+  // Hero
+  heroBackground: '',
+  heroOverlay: 0.7,
+  heroHeight: 100,
+  heroVideo: 'ОБЛОЖКА.mp4',
+  
+  // Global video
+  globalVideo: 'azizov hulk.MOV',
+  globalVideoEnabled: true,
+  
+  // Icons
+  iconStyle: 'solid',
+  iconSize: 24,
+  
+  // Text Content
+  heroTitle: 'СТАНЬ ЛУЧШЕЙ ВЕРСИЕЙ СЕБЯ',
+  heroSubtitle: 'Профессиональные тренеры и индивидуальные программы для достижения максимального результата',
+  heroButtonText: 'Выбрать себе тренера',
+  trainersTitle: 'ТИТУЛОВАННЫЙ ТРЕНЕРСКИЙ СОСТАВ',
+  trainersSubtitle: 'Команда профессиональных дипломированных специалистов со стажем более 12 лет',
+  
+  // Animations
+  enableScrollAnimations: true,
+  animationSpeed: 300,
+  
+  // Filters
+  filters: [
+    { id: 1, text: 'Фитнес', filter: 'all', color: '#f4d03f', textColor: '#1a1a1a' },
+    { id: 2, text: 'Кроссфит', filter: 'Кроссфит', color: '#3a3a3a', textColor: '#ffffff' },
+    { id: 3, text: 'Бодибилдинг', filter: 'Бодибилдинг', color: '#3a3a3a', textColor: '#ffffff' },
+    { id: 4, text: 'Бокс', filter: 'Бокс', color: '#3a3a3a', textColor: '#ffffff' },
+    { id: 5, text: 'Боевые единоборства', filter: 'Единоборства', color: '#3a3a3a', textColor: '#ffffff' }
+  ]
+};
+
 export class Auth {
   constructor(visualEditor) {
     this.isAuthenticated = false;
@@ -46,9 +111,8 @@ export class Auth {
     this.firebaseManager = new FirebaseManager();
     // Cache for trainers
     this.cachedTrainers = null;
-    // Undo history
-    this.undoHistory = [];
-    this.maxUndoSteps = 10;
+    // Design settings undo history (unlimited)
+    this.designUndoHistory = [];
     
     this.init();
   }
@@ -61,14 +125,14 @@ export class Auth {
       this.showAdminMenu();
     }
     
-    // Clear old undo history to prevent quota issues
+    // Load design undo history
     try {
-      const history = localStorage.getItem('undoHistory');
-      if (history && history.length > 50000) {
-        localStorage.removeItem('undoHistory');
+      const history = localStorage.getItem('designUndoHistory');
+      if (history) {
+        this.designUndoHistory = JSON.parse(history);
       }
     } catch (e) {
-      localStorage.removeItem('undoHistory');
+      this.designUndoHistory = [];
     }
 
     this.setupEventListeners();
@@ -662,6 +726,7 @@ export class Auth {
 
           <div class="admin-form-actions">
             <button class="admin-btn admin-btn--add" id="saveContentBtn">Сохранить и применить</button>
+            <button class="admin-btn" id="undoDesignBtn" style="background: #ff9800;">↩ Отменить</button>
             <button class="admin-btn admin-btn--delete" id="resetContentBtn">Сбросить к умолчанию</button>
           </div>
         </div>
@@ -790,15 +855,25 @@ export class Auth {
 
     // Save button
     document.getElementById('saveContentBtn')?.addEventListener('click', () => {
+      this.saveDesignState(); // Save current state before changes
       this.saveContentSettings();
     });
 
-    // Reset button
+    // Undo design button
+    document.getElementById('undoDesignBtn')?.addEventListener('click', () => {
+      this.undoDesignSettings();
+    });
+
+    // Reset button - applies default settings instead of removing
     document.getElementById('resetContentBtn')?.addEventListener('click', () => {
       if (confirm('Сбросить все настройки к значениям по умолчанию?')) {
-        localStorage.removeItem('siteSettings');
-        showToast('Настройки сброшены!', 'success');
-        setTimeout(() => window.location.reload(), 1000);
+        this.saveDesignState(); // Save current state before reset
+        localStorage.setItem('siteSettings', JSON.stringify(DEFAULT_DESIGN_SETTINGS));
+        this.applyContentSettings(DEFAULT_DESIGN_SETTINGS);
+        showToast('Настройки сброшены к умолчанию!', 'success');
+        // Re-render content panel to show default values
+        this.renderAdminContent('content');
+        this.setupContentPanel();
       }
     });
     
@@ -1905,6 +1980,64 @@ export class Auth {
     this.updatePageFilters(settings.filters);
     
     showToast('Настройки сохранены!', 'success');
+  }
+  
+  // Save current design state to undo history
+  saveDesignState() {
+    const currentSettings = localStorage.getItem('siteSettings');
+    const state = currentSettings ? JSON.parse(currentSettings) : { ...DEFAULT_DESIGN_SETTINGS };
+    
+    // Add to history
+    this.designUndoHistory.push({
+      timestamp: Date.now(),
+      settings: state
+    });
+    
+    // Save history to localStorage
+    try {
+      localStorage.setItem('designUndoHistory', JSON.stringify(this.designUndoHistory));
+    } catch (e) {
+      // If quota exceeded, remove oldest entries
+      while (this.designUndoHistory.length > 10) {
+        this.designUndoHistory.shift();
+      }
+      localStorage.setItem('designUndoHistory', JSON.stringify(this.designUndoHistory));
+    }
+  }
+  
+  // Undo last design change
+  undoDesignSettings() {
+    if (this.designUndoHistory.length === 0) {
+      showToast('Нет действий для отмены', 'info');
+      return;
+    }
+    
+    // Get last state
+    const lastState = this.designUndoHistory.pop();
+    
+    // Save updated history
+    localStorage.setItem('designUndoHistory', JSON.stringify(this.designUndoHistory));
+    
+    // Apply the previous settings
+    localStorage.setItem('siteSettings', JSON.stringify(lastState.settings));
+    this.applyContentSettings(lastState.settings);
+    
+    // Re-render content panel to show restored values
+    this.renderAdminContent('content');
+    this.setupContentPanel();
+    
+    // Update filters on page
+    if (lastState.settings.filters) {
+      this.updatePageFilters(lastState.settings.filters);
+    }
+    
+    const remaining = this.designUndoHistory.length;
+    showToast(`Отменено! Осталось ${remaining} действий для отмены`, 'success');
+  }
+  
+  // Get default settings
+  getDefaultSettings() {
+    return { ...DEFAULT_DESIGN_SETTINGS };
   }
   
   collectFiltersData() {
