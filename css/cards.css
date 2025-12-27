@@ -67,28 +67,27 @@
 
 .card__badges {
   position: absolute;
-  bottom: 8px;
-  left: 8px;
-  top: auto;
+  top: 6px;
+  left: 6px;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   gap: 3px;
   z-index: 2;
-  max-width: calc(100% - 16px);
+  max-width: calc(100% - 12px);
 }
 
 .card__badge {
   background-color: var(--color-secondary);
   color: var(--color-text-dark);
-  padding: 2px 6px;
-  font-size: 9px;
+  padding: 2px 5px;
+  font-size: 8px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
   white-space: nowrap;
-  border-radius: 3px;
-  max-width: 100px;
+  border-radius: 2px;
+  max-width: 80px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
