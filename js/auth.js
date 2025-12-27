@@ -1697,10 +1697,16 @@ export class Auth {
     const filtersContainer = document.querySelector('.trainers-filters');
     if (!filtersContainer || !filters || filters.length === 0) return;
     
+    // Store filters data for styling
+    const filtersData = filters;
+    
     filtersContainer.innerHTML = filters.map((f, index) => `
       <button class="filter-btn ${index === 0 ? 'filter-btn--active' : ''}" 
-              data-filter="${f.filter}" 
-              style="background-color: ${f.color}; color: ${f.textColor}; border-color: ${f.color === 'transparent' || f.color === '#3a3a3a' ? '#444' : f.color};">
+              data-filter="${f.filter}"
+              data-index="${index}"
+              style="background-color: ${index === 0 ? '#f4d03f' : (f.color === 'transparent' ? '#3a3a3a' : f.color)}; 
+                     color: ${index === 0 ? '#1a1a1a' : f.textColor}; 
+                     border-color: ${f.color === 'transparent' || f.color === '#3a3a3a' ? '#444' : f.color};">
         ${f.text}
       </button>
     `).join('');
@@ -1709,12 +1715,22 @@ export class Auth {
     filtersContainer.querySelectorAll('.filter-btn').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         const filter = e.target.getAttribute('data-filter');
+        const clickedIndex = parseInt(e.target.getAttribute('data-index'));
         
-        // Update active button style
-        filtersContainer.querySelectorAll('.filter-btn').forEach(b => {
+        // Update active button style - reset all buttons then highlight clicked
+        filtersContainer.querySelectorAll('.filter-btn').forEach((b, idx) => {
           b.classList.remove('filter-btn--active');
+          const fData = filtersData[idx];
+          if (fData) {
+            b.style.backgroundColor = fData.color === 'transparent' ? '#3a3a3a' : fData.color;
+            b.style.color = fData.textColor;
+          }
         });
+        
+        // Highlight clicked button
         e.target.classList.add('filter-btn--active');
+        e.target.style.backgroundColor = '#f4d03f';
+        e.target.style.color = '#1a1a1a';
         
         // Filter products directly
         try {

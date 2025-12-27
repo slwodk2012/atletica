@@ -166,11 +166,18 @@ class App {
   handleFilterClick(button) {
     const filter = button.getAttribute('data-filter');
     
-    // Update active button
+    // Update active button - reset all styles then highlight clicked
     document.querySelectorAll('.filter-btn').forEach(btn => {
       btn.classList.remove('filter-btn--active');
+      // Reset to default inactive style
+      btn.style.backgroundColor = '#3a3a3a';
+      btn.style.color = '#ffffff';
     });
+    
+    // Highlight clicked button
     button.classList.add('filter-btn--active');
+    button.style.backgroundColor = '#f4d03f';
+    button.style.color = '#1a1a1a';
 
     // Filter products
     const validProducts = this.dataManager.getValidProducts();
