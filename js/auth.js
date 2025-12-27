@@ -1698,39 +1698,33 @@ export class Auth {
     if (!filtersContainer || !filters || filters.length === 0) return;
     
     // Store filters data for styling
-    const filtersData = filters;
+    const filtersData = [...filters];
     
     filtersContainer.innerHTML = filters.map((f, index) => `
       <button class="filter-btn ${index === 0 ? 'filter-btn--active' : ''}" 
               data-filter="${f.filter}"
-              data-index="${index}"
-              style="background-color: ${index === 0 ? '#f4d03f' : (f.color === 'transparent' ? '#3a3a3a' : f.color)}; 
-                     color: ${index === 0 ? '#1a1a1a' : f.textColor}; 
-                     border-color: ${f.color === 'transparent' || f.color === '#3a3a3a' ? '#444' : f.color};">
+              data-index="${index}">
         ${f.text}
       </button>
     `).join('');
     
     // Re-attach event listeners directly to filter gallery
-    filtersContainer.querySelectorAll('.filter-btn').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        const filter = e.target.getAttribute('data-filter');
-        const clickedIndex = parseInt(e.target.getAttribute('data-index'));
+    const buttons = filtersContainer.querySelectorAll('.filter-btn');
+    buttons.forEach((btn, btnIndex) => {
+      btn.addEventListener('click', async function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const button = this;
+        const filter = button.getAttribute('data-filter');
         
         // Update active button style - reset all buttons then highlight clicked
-        filtersContainer.querySelectorAll('.filter-btn').forEach((b, idx) => {
+        buttons.forEach((b) => {
           b.classList.remove('filter-btn--active');
-          const fData = filtersData[idx];
-          if (fData) {
-            b.style.backgroundColor = fData.color === 'transparent' ? '#3a3a3a' : fData.color;
-            b.style.color = fData.textColor;
-          }
         });
         
         // Highlight clicked button
-        e.target.classList.add('filter-btn--active');
-        e.target.style.backgroundColor = '#f4d03f';
-        e.target.style.color = '#1a1a1a';
+        button.classList.add('filter-btn--active');
         
         // Filter products directly
         try {
