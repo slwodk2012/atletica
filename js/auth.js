@@ -174,6 +174,23 @@ export class Auth {
       this.handleLogin();
     });
 
+    // Password toggle
+    document.getElementById('togglePassword')?.addEventListener('click', () => {
+      const passwordInput = document.getElementById('loginPassword');
+      const showIcon = document.querySelector('.eye-icon--show');
+      const hideIcon = document.querySelector('.eye-icon--hide');
+      
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        showIcon.style.display = 'none';
+        hideIcon.style.display = 'block';
+      } else {
+        passwordInput.type = 'password';
+        showIcon.style.display = 'block';
+        hideIcon.style.display = 'none';
+      }
+    });
+
     // Logout button
     document.getElementById('logoutBtn')?.addEventListener('click', (e) => {
       e.preventDefault();

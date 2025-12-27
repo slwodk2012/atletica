@@ -196,6 +196,41 @@ body.modal-open .hamburger-menu {
   border-color: #f4d03f;
 }
 
+/* Password input with toggle */
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper input {
+  width: 100%;
+  padding-right: 50px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  color: #888;
+  transition: color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.password-toggle:hover {
+  color: #f4d03f;
+}
+
+.password-toggle .eye-icon {
+  width: 22px;
+  height: 22px;
+}
+
 .auth-form__button {
   padding: 16px;
   background: #f4d03f;
